@@ -6,7 +6,7 @@ from first_layer_ABS import FirstAbstractionLayer
 class UserRepository(ABC,FirstAbstractionLayer[User]):
 
     @abstractmethod
-    def get_role(self, id:int) -> User:
+    def get_role(self, id:int) -> str:
         pass
 
    

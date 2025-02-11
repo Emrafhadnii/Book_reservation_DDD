@@ -11,7 +11,7 @@ class Book(Base):
     id = Column(Integer, Sequence('book_id_seq'), primary_key=True)
     title = Column(String(200), nullable=False)
     isbn = Column(String(13), unique=True, nullable=False)
-    price = Column(Numeric, nullable=False)
+    price = Column(Integer, nullable=False)
     genre_id = Column(Integer, ForeignKey('genres.id'))
     book_desc = Column(String(100), default='')
     units = Column(Integer, nullable=False)
@@ -49,7 +49,7 @@ class Reservation(Base):
     book_id = Column(Integer, ForeignKey('books.id'))
     start_time = Column(TIMESTAMP, nullable=False)
     end_time = Column(TIMESTAMP, nullable=False)
-    price = Column(Numeric, default=0)
+    price = Column(Integer, default=0)
 
     customer = relationship("Customer", backref="reservations", cascade="all, delete")
     book = relationship("Book", backref="reservations", cascade="all, delete")
@@ -72,7 +72,7 @@ class Customer(Base):
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     sub_model = Column(Enum(SubscriptionModel), nullable=False)
     subscription_end = Column(TIMESTAMP)
-    wallet = Column(Numeric, default=0)
+    wallet = Column(Integer, default=0)
 
     user = relationship("User", back_populates="customer", uselist=False)
     reservations = relationship("Reservation", backref="customer", cascade="all, delete")
@@ -85,7 +85,6 @@ class City(Base):
 
     id = Column(Integer, Sequence('city_id_seq'), primary_key=True)
     city_name = Column(String(50), nullable=False)
-    city_detail = Column(String(250))
     authors = relationship("Author", backref="city")
 
 

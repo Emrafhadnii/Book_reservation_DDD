@@ -7,5 +7,5 @@ from first_layer_ABS import FirstAbstractionLayer
 class ReservationRepository(ABC,FirstAbstractionLayer[Reservation]):
 
     @abstractmethod
-    def ended_reservations(self, book_id: int,start_date: datetime,end_date: datetime) -> List[Reservation]:
+    def delete_ended_reservations(self, reservation_id: int,start_date: datetime,end_date: datetime) -> List[Reservation]:
         pass
