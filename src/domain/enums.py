@@ -1,16 +1,16 @@
 from enum import Enum
 
 class UserRole(Enum):
-    ADMIN = "admin"
-    CUSTOMER = "customer"
-    AUTHOR = "author"
+    ADMIN = "ADMIN"
+    CUSTOMER = "CUSTOMER"
+    AUTHOR = "AUTHOR"
 
 class SubscriptionModel(Enum):
-    FREE = "free"
-    PLUS = "plus"
-    PREMIUM = "premium"
+    FREE = "FREE"
+    PLUS = "PLUS"
+    PREMIUM = "PREMIUM"
 
 class ReservationStatus(Enum):
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    QUEUED = "queued"
+    ACTIVE = "ACTIVE"
+    COMPLETED = "COMPLETED"
+    QUEUED = "QUEUED"

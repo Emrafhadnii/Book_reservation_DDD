@@ -1,15 +1,15 @@
 from datetime import datetime
 from pydantic import BaseModel, field_validator
-from Users import Customer
-from Books import Book
-
+from src.domain.entities.Users import Customer
+from src.domain.entities.Books import Book
+from typing import Optional
 
 class Reservation(BaseModel):
-    id: int
+    id: Optional[int]
     customer: Customer
     book: Book
     start_time: datetime
-    end_time: datetime
+    end_time: Optional[datetime]
     price: int
 
     def __eq__(self, other):
@@ -23,4 +23,3 @@ class Reservation(BaseModel):
 
     class Config:
         from_attributes = True
-        orm_mode = True

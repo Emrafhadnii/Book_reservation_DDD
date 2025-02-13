@@ -5,11 +5,10 @@ from src.domain.entities.Users import User as UserEntity
 from src.adapters.models_mappers.models import User
 from typing import Optional, List
 from src.adapters.models_mappers.Usermapper import Usermapper
-from setup_db.database import asyncsession
-
+from src.domain.entities.auth import emailResponsemodel
 
 class SqlAlchemyUserRepository(UserRepository):
-    def __init__(self, db: AsyncSession = asyncsession):
+    def __init__(self, db: AsyncSession):
         self.db = db 
 
     async def get_by_id(self, id: int) -> Optional[UserEntity]:
@@ -27,20 +26,14 @@ class SqlAlchemyUserRepository(UserRepository):
         user_to_delete = result.scalar_one_or_none()
         if user_to_delete:
             await self.db.delete(user_to_delete)
-            await self.db.commit()
 
-    async def update(self, t: UserEntity) -> None:
-        userSQL = Usermapper.to_SQL(t)
-        result = await self.db.execute(select(User).filter(User.id == userSQL.id))
-        user_to_update = result.scalar_one_or_none()
-        if user_to_update:
-            self.db.merge(user_to_update)
-            await self.db.commit()
+    async def update(self, user: UserEntity) -> None:
+        reservationSQL = UserEntity.to_SQL(user)
+        self.db.flush(reservationSQL)
 
     async def add(self, t: UserEntity) -> None:
         userSQL = Usermapper.to_SQL(t)
         self.db.add(userSQL)
-        await self.db.commit()
 
     async def get_role(self, id: int) -> str:
         result = await self.db.execute(select(User).filter(User.id == id))
@@ -48,3 +41,12 @@ class SqlAlchemyUserRepository(UserRepository):
         if not role:
             raise ValueError(f"User with id {id} not found")
         return role.user_role
+    
+    async def get_by_phone(self, phone) -> emailResponsemodel:
+        result = await self.db.execute(select(User).filter(User.phone == phone))
+        user = result.scalar_one_or_none()
+        if user:
+            return emailResponsemodel(phone=user.phone, id=user.id, user_role=user.user_role,password=user.user_password)
+        else:
+            raise ValueError(f"User with phone {phone} not found")
+        

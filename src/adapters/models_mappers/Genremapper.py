@@ -1,4 +1,4 @@
-from models import Genre
+from src.adapters.models_mappers.models import Genre
 from src.domain.entities.Books import Genre as GenreEntity
 
 class Genremapper:

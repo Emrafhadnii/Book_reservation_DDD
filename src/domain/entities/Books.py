@@ -1,23 +1,21 @@
 from pydantic import BaseModel,field_validator
 from typing import List, Optional
-from Users import Author, User, Book
+from src.domain.entities.Users import Author,Customer
 
 
 class Genre(BaseModel):
     id: int
     gen_name: str
-    books: List[Book] = []
 
     def __eq__(self, other):
         return isinstance(other, Genre) and self.id == other.id
 
     class Config:
         from_attributes = True
-        orm_mode = True
 
 
 class Book(BaseModel):
-    id: int
+    id: Optional[int]
     title: str
     isbn: str
     price: int
@@ -41,4 +39,3 @@ class Book(BaseModel):
         return count
     class Config:
         from_attributes = True
-        orm_mode = True

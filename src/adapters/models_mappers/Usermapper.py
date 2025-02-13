@@ -1,4 +1,4 @@
-from models import User
+from src.adapters.models_mappers.models import User
 from src.domain.entities.Users import User as UserEntity
 
 class Usermapper:

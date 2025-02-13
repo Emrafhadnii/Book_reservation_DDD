@@ -1,4 +1,4 @@
-from models import Customer
+from src.adapters.models_mappers.models import Customer
 from src.domain.entities.Users import Customer as CustomerEntity
 
 class Customermapper:

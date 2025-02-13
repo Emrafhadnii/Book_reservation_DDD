@@ -2,16 +2,16 @@ from pydantic import BaseModel, field_validator
 from datetime import datetime
 from typing import Optional, List
 from src.domain.enums import UserRole
-from Reservation import Reservation
-from Books import Book
+# from src.domain.entities.Reservations import Reservation
+# from src.domain.entities.Books import Book
 from src.domain.enums import SubscriptionModel
 
 
 class User(BaseModel):
-    id: int
+    id: Optional[int]
     username: str
     email: str
-    user_role: UserRole
+    user_role: str
     user_password: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -23,15 +23,12 @@ class User(BaseModel):
 
     class Config:
         from_attributes = True
-        orm_mode = True
 
 class Customer(BaseModel):
-    sub_model: SubscriptionModel
+    sub_model: str
     subscription_end: Optional[datetime] = None
     wallet: int = 0
-    reservations: List[Reservation] = []
     user: User
-
 
     def __eq__(self, other):
         return isinstance(other, Customer) and self.id == other.id
@@ -44,14 +41,12 @@ class Customer(BaseModel):
     
     class Config:
         from_attributes = True
-        orm_mode = True
-
 
 class Author(BaseModel):
     city_id: int
     goodreads_link: Optional[str] = None
     bank_account: Optional[str] = None
-    books: List[Book] = []
+    # books: List[Book] = []
     user: User
 
     def __eq__(self, other):
@@ -59,7 +54,6 @@ class Author(BaseModel):
 
     class Config:
         from_attributes = True
-        orm_mode = True
    
 
 
@@ -73,6 +67,5 @@ class City(BaseModel):
 
     class Config:
         from_attributes = True
-        orm_mode = True
 
 

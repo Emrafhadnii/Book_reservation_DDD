@@ -1,14 +1,14 @@
 INSERT INTO users(username,first_name,last_name,phone,user_password,email,user_role) VALUES
-('admin1', 'Ali', 'Rezaei', '09123456789', 'ali912','admin1@example.com', 'admin'),
-('customer1', 'Sara', 'Moradi', '09123456788', 'saramoradi','customer1@example.com', 'customer'),
-('author1', 'Mohammad', 'Ahmadi', '09123456787', '6787ahmadi','author1@example.com', 'author'),
-('customer2', 'Reza', 'Hosseini', '09123456786', 'reza6786','customer2@example.com', 'customer'),
-('author2', 'Fatemeh', 'Karimi', '09123456785', '1403fateme','author2@example.com', 'author'),
-('customer3', 'Zahra', 'Alavi', '09123456784', 'zahala','customer3@example.com', 'customer'),
-('admin2', 'Hossein', 'Mohammadi', '09123456783', '@hossein','admin2@example.com', 'admin'),
-('author3', 'Maryam', 'Sadeghi', '09123456782', 'maryam6782','author3@example.com', 'author'),
-('customer4', 'Amir', 'Rahimi', '09123456781', 'amirrahimi6781','customer4@example.com', 'customer'),
-('author4', 'Narges', 'Gholami', '09123456780', 'narges6780','author4@example.com', 'author');
+('admin1', 'Ali', 'Rezaei', '09123456789', 'ali912','admin1@example.com', 'ADMIN'),
+('customer1', 'Sara', 'Moradi', '09123456788', 'saramoradi','customer1@example.com', 'CUSTOMER'),
+('author1', 'Mohammad', 'Ahmadi', '09123456787', '6787ahmadi','author1@example.com', 'AUTHOR'),
+('customer2', 'Reza', 'Hosseini', '09123456786', 'reza6786','customer2@example.com', 'CUSTOMER'),
+('author2', 'Fatemeh', 'Karimi', '09123456785', '1403fateme','author2@example.com', 'AUTHOR'),
+('customer3', 'Zahra', 'Alavi', '09123456784', 'zahala','customer3@example.com', 'CUSTOMER'),
+('admin2', 'Hossein', 'Mohammadi', '09123456783', '@hossein','admin2@example.com', 'ADMIN'),
+('author3', 'Maryam', 'Sadeghi', '09123456782', 'maryam6782','author3@example.com', 'AUTHOR'),
+('customer4', 'Amir', 'Rahimi', '09123456781', 'amirrahimi6781','customer4@example.com', 'CUSTOMER'),
+('author4', 'Narges', 'Gholami', '09123456780', 'narges6780','author4@example.com', 'AUTHOR');
 
 INSERT INTO cities (city_name) VALUES
 ('Tehran'),
@@ -35,16 +35,16 @@ INSERT INTO authors (id, city_id, goodreads_link, bank_account) VALUES
 (10, 10, 'https://www.goodreads.com/author10', '234567890123');
 
 INSERT INTO customers (id, sub_model, subscription_end, wallet) VALUES
-(1, 'free', '2024-12-31 23:59:59', 120000),
-(2, 'plus', '2025-06-30 23:59:59', 200000),
-(3, 'premium', '2024-10-15 23:59:59', 0),
-(4, 'free', '2024-11-30 23:59:59', 26000),
-(5, 'plus', '2025-01-31 23:59:59', 50000),
-(6, 'premium', '2024-09-30 23:59:59', 100000),
-(7, 'free', '2024-08-31 23:59:59', 15000),
-(8, 'plus', '2025-03-31 23:59:59', 2000),
-(9, 'premium', '2024-07-31 23:59:59', 1000000),
-(10, 'free', '2024-12-31 23:59:59', 44000);
+(1, 'FREE', '2024-12-31 23:59:59', 120000),
+(2, 'PLUS', '2025-06-30 23:59:59', 200000),
+(3, 'PREMIUM', '2024-10-15 23:59:59', 0),
+(4, 'FREE', '2024-11-30 23:59:59', 26000),
+(5, 'PLUS', '2025-01-31 23:59:59', 50000),
+(6, 'PREMIUM', '2024-09-30 23:59:59', 100000),
+(7, 'FREE', '2024-08-31 23:59:59', 15000),
+(8, 'PLUS', '2025-03-31 23:59:59', 2000),
+(9, 'PREMIUM', '2024-07-31 23:59:59', 1000000),
+(10, 'FREE', '2024-12-31 23:59:59', 44000);
 
 INSERT INTO genres (gen_name) VALUES
 ('Science Fiction'),

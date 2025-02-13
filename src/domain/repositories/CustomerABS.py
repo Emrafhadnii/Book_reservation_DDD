@@ -3,10 +3,10 @@ from typing import Optional, List
 from src.domain.entities.Users import Customer
 from src.domain.enums import SubscriptionModel
 from datetime import datetime
-from first_layer_ABS import FirstAbstractionLayer
+from src.domain.repositories.first_layer_ABS import FirstAbstractionLayer
 
-class CustomerRepository(ABC,FirstAbstractionLayer[Customer]):
-    
+class CustomerRepository(FirstAbstractionLayer[Customer]):
+
     @abstractmethod
     def change_subscription(self,user_id: int,new_model: SubscriptionModel,end_date: datetime) -> Customer:
         pass

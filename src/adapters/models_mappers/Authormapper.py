@@ -1,4 +1,4 @@
-from models import Author
+from src.adapters.models_mappers.models import Author
 from src.domain.entities.Users import Author as AuthorEntity
 
 class Authormapper:

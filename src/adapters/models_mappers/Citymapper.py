@@ -1,4 +1,4 @@
-from models import City
+from src.adapters.models_mappers.models import City
 from src.domain.entities.Users import City as CityEntity
 
 class Citymapper:

@@ -1,40 +1,42 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy import select, delete
 from src.domain.repositories.BookABS import BookRepository
+from src.adapters.repositories.ReservationRepo import SqlAlchemyReservationRepository
+from src.adapters.repositories.CustomerRepo import SqlAlchemyCustomerRepository
+from src.adapters.repositories.UserRepository import SqlAlchemyUserRepository
 from src.domain.entities.Books import Book as BookEntity
+from src.domain.entities.Reservations import Reservation as ReservationEntity
+from src.domain.entities.Users import Customer as CustomerEntity
+from src.adapters.models_mappers.Customermapper import Customermapper
 from src.adapters.models_mappers.models import Book as BookSQL
 from typing import Optional, List
 from src.adapters.models_mappers.Bookmapper import Bookmapper
-from setup_db.database import asyncsession
+from datetime import datetime, UTC, timedelta
+from src.adapters.repositories.GenericUOW import UnitOfWork
+
 
 class SqlAlchemyBookRepository(BookRepository):
-    def __init__(self, db: AsyncSession = asyncsession):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
     async def add(self, book: BookEntity) -> None:
         bookSQL = Bookmapper.to_SQL(book)
         self.db.add(bookSQL)
-        await self.db.commit()
     
     async def update(self, book : BookEntity) -> None:
         bookSQL = Bookmapper.to_SQL(book)
-        result = await self.db.execute(select(BookSQL).filter(BookSQL.id == bookSQL.id))
-        book_to_update = result.scalar_one_or_none()
-        if book_to_update:
-            self.db.merge(book_to_update)
-            await self.db.commit()
+        self.db.flush(bookSQL)
     
     async def delete(self, id : int) -> None:
         result = await self.db.execute(select(BookSQL).filter(BookSQL.id == id))
         book_to_delete = result.scalar_one_or_none()
         if book_to_delete:
             await self.db.delete(book_to_delete)
-            await self.db.commit()
     
     async def get_by_id(self, id: int) -> Optional[BookEntity]:
         result = await self.db.execute(select(BookSQL).filter(BookSQL.id == id))
-        resrvation = result.scalar_one_or_none()
-        return Bookmapper.to_Entity(resrvation)   
+        book = result.scalar_one_or_none()
+        return Bookmapper.to_Entity(book) if book else None
     
     async def get_all(self) -> List[BookEntity]:
         result = await self.db.execute(select(BookSQL))

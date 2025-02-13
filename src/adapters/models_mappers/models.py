@@ -17,9 +17,9 @@ class Book(Base):
     units = Column(Integer, nullable=False)
     author_id = Column(Integer, ForeignKey('authors.id'))
 
-    genre = relationship("Genre", backref="books")
-    authors = relationship("Author", backref="books", secondary="book_author", cascade="all, delete")
-
+    genre = relationship("Genre", back_populates="books")
+    authors = relationship("Author", back_populates="books", secondary="book_author", cascade="all, delete")
+    reservations = relationship("Reservation", back_populates="book") 
 
    
 
@@ -27,11 +27,11 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
-    username = Column(String(50), unique=True, nullable=False, index=True)
+    username = Column(String(50), unique=True, nullable=False)
     first_name = Column(String(50))
     last_name = Column(String(50))
     phone = Column(String(13))
-    email = Column(String(100), unique=True, nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False)
     user_password = Column(String(100), nullable=False)
     user_role = Column(Enum(UserRole), nullable=False)
     
@@ -51,8 +51,8 @@ class Reservation(Base):
     end_time = Column(TIMESTAMP, nullable=False)
     price = Column(Integer, default=0)
 
-    customer = relationship("Customer", backref="reservations", cascade="all, delete")
-    book = relationship("Book", backref="reservations", cascade="all, delete")
+    customer = relationship("Customer", back_populates="reservations", cascade="all, delete")
+    book = relationship("Book", back_populates="reservations", cascade="all, delete")
 
 
 
@@ -61,7 +61,7 @@ class Genre(Base):
 
     id = Column(Integer, Sequence('genre_id_seq'), primary_key=True)
     gen_name = Column(String(50), nullable=False)
-    books = relationship("Book", backref="genre")
+    books = relationship("Book", back_populates="genre")
 
 
 
@@ -75,7 +75,7 @@ class Customer(Base):
     wallet = Column(Integer, default=0)
 
     user = relationship("User", back_populates="customer", uselist=False)
-    reservations = relationship("Reservation", backref="customer", cascade="all, delete")
+    reservations = relationship("Reservation", back_populates="customer", cascade="all, delete")
 
 
 
@@ -85,7 +85,7 @@ class City(Base):
 
     id = Column(Integer, Sequence('city_id_seq'), primary_key=True)
     city_name = Column(String(50), nullable=False)
-    authors = relationship("Author", backref="city")
+    authors = relationship("Author", back_populates="city")
 
 
 
@@ -99,8 +99,8 @@ class Author(Base):
     bank_account = Column(String(50))
 
     books = relationship("Book", secondary="book_author", back_populates="authors")
-    user = relationship("User", back_populates="authors", uselist=False)
-    city = relationship("City", backref="authors", uselist=False)
+    user = relationship("User", back_populates="author", uselist=False)
+    city = relationship("City", back_populates="authors", uselist=False)
 
 
 

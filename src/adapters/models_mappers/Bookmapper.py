@@ -1,4 +1,4 @@
-from models import Book
+from src.adapters.models_mappers.models import Book
 from src.domain.entities.Books import Book as BookEntity
 
 class Bookmapper:
