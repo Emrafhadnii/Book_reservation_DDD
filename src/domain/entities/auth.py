@@ -13,3 +13,7 @@ class LoginRequest(BaseModel):
 class emailResponsemodel(LoginRequest):
     id: int
     user_role: str
+
+class Verifyotp(BaseModel):
+    otp_code: str
+    user_identifier: str
