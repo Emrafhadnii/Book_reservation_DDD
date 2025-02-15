@@ -13,7 +13,6 @@ from src.adapters.models_mappers.models import Book as BookSQL
 from typing import Optional, List
 from src.adapters.models_mappers.Bookmapper import Bookmapper
 from datetime import datetime, UTC, timedelta
-from src.adapters.repositories.GenericUOW import UnitOfWork
 
 
 class SqlAlchemyBookRepository(BookRepository):
