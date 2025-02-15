@@ -1,6 +1,5 @@
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, registry
+from sqlalchemy.orm import registry
 from config.setting import settings
 
 

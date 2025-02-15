@@ -1,6 +1,4 @@
 from fastapi import FastAPI, HTTPException,Depends
-from sqlalchemy.orm import sessionmaker
-from pydantic import BaseModel
 from src.entrypoints.getbook import router as book_router
 from src.entrypoints.auth import router
 from src.entrypoints.reservation import router as reserve_route

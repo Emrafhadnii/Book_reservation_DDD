@@ -1,8 +1,3 @@
-from contextlib import asynccontextmanager
-from typing import Type, Generic, TypeVar
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
-from logging import Logger
 from setup_db.database import SessionLocal
 from src.adapters.repositories.UserRepository import SqlAlchemyUserRepository
 from src.adapters.repositories.BookRepo import SqlAlchemyBookRepository

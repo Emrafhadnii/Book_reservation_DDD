@@ -6,7 +6,7 @@ from src.adapters.models_mappers.models import Customer as CustomerSQL
 from typing import Optional, List
 from src.adapters.models_mappers.Customermapper import Customermapper
 from src.domain.enums import SubscriptionModel
-from datetime import datetime, UTC
+from datetime import datetime
 
 class SqlAlchemyCustomerRepository(CustomerRepository):
     def __init__(self, db: AsyncSession):

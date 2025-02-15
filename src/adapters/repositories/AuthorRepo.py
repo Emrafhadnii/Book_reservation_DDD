@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select,delete
+from sqlalchemy import select
 from src.domain.repositories.AuthorsABS import AuthorRepository
 from src.domain.entities.Users import Author as AuthorEntity
 from src.adapters.models_mappers.models import Author as AuthorSQL
