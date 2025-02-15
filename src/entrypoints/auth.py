@@ -37,5 +37,6 @@ async def refresh_token(refresh_token: str):
 @router.post("/otp")
 async def send_opt():
     print(randint(100000,999999))
-
+    pass
+    
 
