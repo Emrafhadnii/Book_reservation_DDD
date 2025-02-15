@@ -22,13 +22,13 @@ async def login_route(form_data: LoginRequest, user_repo: UnitOfWork = Depends(g
         raise HTTPException(status_code=400,detail="Incorrect email or password")
 
     user_identifier = str(uuid4())
-    redis.setex(
+    await redis.setex(
         name=f"login_identifier:{user_identifier}",
         time=120,
         value=str(user.id)
         )
 
-    await otp_generator(user.phone, redis)
+    await otp_generator(user.id, redis)
 
     return {
         "message": "otp sent",
@@ -51,9 +51,14 @@ async def refresh_token(refresh_token: str):
 
 @router.post("/verify-otp/")
 async def verify_otp(verifyotp: Verifyotp, redis: Redis = Depends(get_redis), uow: UnitOfWork = Depends(get_uow)):
+    
     user_id = await redis.get(f"login_identifier:{verifyotp.user_identifier}")
     if not user_id:
         raise HTTPException(400, "identifier expired or invalid")
+
+    print(user_id)
+    print(verifyotp.user_identifier)
+    print(verifyotp.otp_code)
 
     if not await otp_validator(user_identifier=user_id, otp=verifyotp.otp_code, redis=redis):
         raise HTTPException(400, "Invalid OTP")

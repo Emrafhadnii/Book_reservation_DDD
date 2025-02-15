@@ -6,7 +6,7 @@ from datetime import timedelta
 async def otp_generator(user_identifier: str, redis: Redis):
     otp_code = str(randint(100000,999999))
     print(otp_code)
-    redis.setex(
+    await redis.setex(
         name=f"otp:{user_identifier}",
         time=timedelta(seconds=120),
         value=otp_code)
