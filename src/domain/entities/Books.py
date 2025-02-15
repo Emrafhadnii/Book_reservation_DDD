@@ -19,7 +19,7 @@ class Book(BaseModel):
     title: str
     isbn: str
     price: int
-    genre: Optional[Genre]
+    genre_id: Optional[int]
     units: int
     authors: List[Author] = []
     book_desc: Optional[str] = ""

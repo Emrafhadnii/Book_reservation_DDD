@@ -5,7 +5,7 @@ from src.domain.entities.Books import Book
 from typing import Optional
 
 class Reservation(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     customer: Customer
     book: Book
     start_time: datetime

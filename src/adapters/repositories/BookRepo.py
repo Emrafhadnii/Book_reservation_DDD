@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy import select, delete
 from src.domain.repositories.BookABS import BookRepository
 from src.adapters.repositories.ReservationRepo import SqlAlchemyReservationRepository
@@ -25,7 +26,7 @@ class SqlAlchemyBookRepository(BookRepository):
     
     async def update(self, book : BookEntity) -> None:
         bookSQL = Bookmapper.to_SQL(book)
-        self.db.flush(bookSQL)
+        await self.db.merge(bookSQL)
     
     async def delete(self, id : int) -> None:
         result = await self.db.execute(select(BookSQL).filter(BookSQL.id == id))
@@ -36,17 +37,18 @@ class SqlAlchemyBookRepository(BookRepository):
     async def get_by_id(self, id: int) -> Optional[BookEntity]:
         result = await self.db.execute(select(BookSQL).filter(BookSQL.id == id))
         book = result.scalar_one_or_none()
-        return Bookmapper.to_Entity(book) if book else None
+        return BookEntity.model_validate(book) if book else None
     
     async def get_all(self) -> List[BookEntity]:
         result = await self.db.execute(select(BookSQL))
         books_list = result.scalars().all()
-        return list(map(Bookmapper.to_Entity,books_list))
+        return list(map(BookEntity.model_validate,books_list))
     
     async def stock_update(self, id, new_stock) -> None:
-        result = await self.db.execute(select(BookSQL).filter(BookSQL.id == id))
+        result = await self.db.execute(
+            select(BookSQL).filter(BookSQL.id == id).options(selectinload(BookSQL.authors)))
         book = result.scalar_one_or_none()
         if book:
-            bookentity = Bookmapper.to_Entity(book)
+            bookentity = BookEntity.model_validate(book)
             bookentity.units += new_stock
             await self.update(bookentity)

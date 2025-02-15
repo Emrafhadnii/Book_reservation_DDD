@@ -4,6 +4,9 @@ from src.services_layer.JWT import JWTService
 from src.adapters.repositories.UserRepository import SqlAlchemyUserRepository
 from src.services_layer.dependencies.userauth import get_uow
 from src.adapters.repositories.GenericUOW import UnitOfWork
+from random import randint
+import redis
+
 
 router = APIRouter(prefix='/login', tags=['login'])
 
@@ -30,6 +33,9 @@ async def refresh_token(refresh_token: str):
     new_access_token = JWTService.create_access_token({"sub": payload.get("sub")})
     return {"access_token": new_access_token}
 
+
 @router.post("/otp")
 async def send_opt():
-    pass
+    print(randint(100000,999999))
+
+

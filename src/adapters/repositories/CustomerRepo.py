@@ -18,7 +18,7 @@ class SqlAlchemyCustomerRepository(CustomerRepository):
     
     async def update(self, customer: CustomerEntity) -> None:
         customerSQL = Customermapper.to_SQL(customer)
-        self.db.flush(customerSQL)
+        await self.db.merge(customerSQL)
     
     async def delete(self, id : int) -> None:
         result = await self.db.execute(select(CustomerSQL).filter(CustomerSQL.id == id))
@@ -29,18 +29,18 @@ class SqlAlchemyCustomerRepository(CustomerRepository):
     async def get_by_id(self, id: int) -> Optional[CustomerEntity]:
         result = await self.db.execute(select(CustomerSQL).filter(CustomerSQL.id == id))
         customer = result.scalar_one_or_none()
-        return Customermapper.to_Entity(customer) if customer else None
+        return CustomerEntity.model_validate(customer) if customer else None
     
     async def get_all(self) -> List[CustomerEntity]:
         result = await self.db.execute(select(CustomerSQL))
         customers_list = result.scalars().all()
-        return list(map(Customermapper.to_Entity,customers_list))
+        return list(map(CustomerEntity.model_validate,customers_list))
     
     async def change_subscription(self, id:int, new_model:SubscriptionModel, end_date:datetime) -> None:
         result = await self.db.execute(select(CustomerSQL).filter(CustomerSQL.id == id))
         customer = result.scalar_one_or_none()
         if customer:
-            customerentity = Customermapper.to_Entity(customer)
+            customerentity = CustomerEntity.model_validate(customer)
             customerentity.sub_model = new_model
             customerentity.subscription_end = end_date
             await self.update(customerentity)
@@ -49,9 +49,9 @@ class SqlAlchemyCustomerRepository(CustomerRepository):
         result = await self.db.execute(select(CustomerSQL).filter(CustomerSQL.id == id))
         customer = result.scalar_one_or_none()
         if customer:
-            customerentity = Customermapper.to_Entity(customer)
+            customerentity =  CustomerEntity.model_validate(customer)
             customerentity.wallet += amount
             await self.update(customerentity)
 
     async def check_subs(self,customer:CustomerEntity) -> bool:
-        return True if (customer.subscription_end > datetime.now(UTC)) else False
+        return True if (customer.subscription_end > datetime.now()) else False

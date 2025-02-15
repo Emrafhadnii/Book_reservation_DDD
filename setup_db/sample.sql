@@ -34,7 +34,7 @@ INSERT INTO authors (id, city_id, goodreads_link, bank_account) VALUES
 (9, 9, 'https://www.goodreads.com/author9', '012345678901'),
 (10, 10, 'https://www.goodreads.com/author10', '234567890123');
 
-INSERT INTO customers (id, sub_model, subscription_end, wallet) VALUES
+INSERT INTO customers(id, sub_model, subscription_end, wallet) VALUES
 (1, 'FREE', '2024-12-31 23:59:59', 120000),
 (2, 'PLUS', '2025-06-30 23:59:59', 200000),
 (3, 'PREMIUM', '2024-10-15 23:59:59', 0),

@@ -1,8 +1,5 @@
 import os
-from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-
-load_dotenv()
 
 class JWTSettings(BaseSettings):
     SECRET_KEY: str = "guess_what"

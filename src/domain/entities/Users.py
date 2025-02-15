@@ -8,7 +8,7 @@ from src.domain.enums import SubscriptionModel
 
 
 class User(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = None
     username: str
     email: str
     user_role: str
@@ -25,7 +25,7 @@ class User(BaseModel):
         from_attributes = True
 
 class Customer(BaseModel):
-    sub_model: str
+    sub_model: str = "FREE"
     subscription_end: Optional[datetime] = None
     wallet: int = 0
     user: User
@@ -46,7 +46,6 @@ class Author(BaseModel):
     city_id: int
     goodreads_link: Optional[str] = None
     bank_account: Optional[str] = None
-    # books: List[Book] = []
     user: User
 
     def __eq__(self, other):

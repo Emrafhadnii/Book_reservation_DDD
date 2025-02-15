@@ -17,7 +17,7 @@ class SqlAlchemyReservationRepository(ReservationRepository):
     
     async def update(self, reservation : ReservationEntity) -> None:
         reservationSQL = ReservationEntity.to_SQL(reservation)
-        self.db.flush(reservationSQL)
+        await self.db.merge(reservationSQL)
     
     async def delete(self, id : int) -> None:
         result = await self.db.execute(select(ReservationSQL).filter(ReservationSQL.id == id))
@@ -28,12 +28,12 @@ class SqlAlchemyReservationRepository(ReservationRepository):
     async def get_by_id(self, id: int) -> Optional[ReservationEntity]:
         result = await self.db.execute(select(ReservationSQL).filter(ReservationSQL.id == id))
         resrvation = result.scalar_one_or_none()
-        return Reservationmapper.to_Entity(resrvation)   
+        return ReservationEntity.model_validate(resrvation)   
     
     async def get_all(self) -> List[ReservationEntity]:
         result = await self.db.execute(select(ReservationSQL))
         reservations_list = result.scalars().all()
-        return list(map(Reservationmapper.to_Entity,reservations_list))
+        return list(map(ReservationEntity.model_validate,reservations_list))
 
     async def delete_ended_reservations(self) -> None:
         result = await self.db.execute(select(ReservationSQL.id).filter(ReservationSQL.end_time < datetime.now()))

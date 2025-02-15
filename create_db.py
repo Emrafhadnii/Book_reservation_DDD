@@ -7,11 +7,13 @@ async def create():
             user=settings.DB_USER,
             password=settings.DB_PASSWORD,
             host=settings.DB_HOST,
-            database="postgres"
+            # database="postgres"
+            database=settings.DB_NAME
         )
-        # await conn.execute('SELECT users.id, users.username, users.first_name, users.last_name, users.phone, users.email, users.user_password, users.user_role FROM users WHERE users.email = "customer4@example.com"')
-        await conn.execute('CREATE DATABASE books_db;')
-        # print("Database 'books_db' created successfully.")
+        # await conn.execute('CREATE DATABASE books_db;')
+        # await conn.execute('DELETE FROM reservations WHERE id = 12;')
+        x = await conn.fetch('SELECT * FROM customers;')
+        print(x)
     except asyncpg.DuplicateDatabaseError as e:
         raise Exception(str(e))
     finally:

@@ -14,12 +14,12 @@ class SqlAlchemyUserRepository(UserRepository):
     async def get_by_id(self, id: int) -> Optional[UserEntity]:
         result = await self.db.execute(select(User).filter(User.id == id))
         user = result.scalar_one_or_none()
-        return Usermapper.to_Entity(user)
+        return UserEntity.model_validate(user)
     
     async def get_all(self) -> List[UserEntity]:
         result = await self.db.execute(select(User))
         users_list = result.scalars().all()
-        return list(map(Usermapper.to_Entity,users_list))
+        return list(map(UserEntity.model_validate,users_list))
 
     async def delete(self, id: int) -> None:
         result = await self.db.execute(select(User).filter(User.id == id))
@@ -29,7 +29,7 @@ class SqlAlchemyUserRepository(UserRepository):
 
     async def update(self, user: UserEntity) -> None:
         reservationSQL = UserEntity.to_SQL(user)
-        self.db.flush(reservationSQL)
+        await self.db.merge(reservationSQL)
 
     async def add(self, t: UserEntity) -> None:
         userSQL = Usermapper.to_SQL(t)

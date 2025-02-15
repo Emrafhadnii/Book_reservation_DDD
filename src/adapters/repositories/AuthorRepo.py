@@ -16,7 +16,7 @@ class SqlAlchemyAuthorRepository(AuthorRepository):
 
     async def update(self, author: AuthorEntity) -> None:
         authorSQL = Authormapper.to_SQL(author)
-        self.db.flush(authorSQL)
+        await self.db.merge(authorSQL)
 
     async def delete(self, id: int) -> None:
         result = await self.db.execute(select(AuthorSQL).filter(AuthorSQL.id == id))
@@ -27,10 +27,10 @@ class SqlAlchemyAuthorRepository(AuthorRepository):
     async def get_all(self) -> List[AuthorEntity]:
         result = await self.db.execute(select(AuthorSQL))
         authors_list = result.scalars().all()
-        return list(map(Authormapper.to_Entity,authors_list))
+        return list(map(AuthorEntity.model_validate,authors_list))
 
     async def get_by_id(self, id: int) -> Optional[AuthorEntity]:
         result = await self.db.execute(select(AuthorSQL).filter(AuthorSQL.id == id))
         author = result.scalar_one_or_none()
-        return Authormapper.to_Entity(author) if author else None   
+        return AuthorEntity.model_validate(author) if author else None   
         

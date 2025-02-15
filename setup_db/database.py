@@ -14,7 +14,7 @@ engine = create_async_engine(DATABASE_URL, echo=True, future=True)
 Base = mapper_registry.generate_base()
 
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession,expire_on_commit=False)
+SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession,expire_on_commit=False)
 
 async def get_session():
     async with SessionLocal() as db:
