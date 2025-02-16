@@ -2,8 +2,6 @@ from pydantic import BaseModel, field_validator
 from datetime import datetime
 from typing import Optional, List
 from src.domain.enums import UserRole
-# from src.domain.entities.Reservations import Reservation
-# from src.domain.entities.Books import Book
 from src.domain.enums import SubscriptionModel
 
 
@@ -16,7 +14,7 @@ class User(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     phone: Optional[str] = None
-
+    
 
     def __eq__(self, other):
         return isinstance(other, User) and self.id == other.id
@@ -31,7 +29,7 @@ class Customer(BaseModel):
     user: User
 
     def __eq__(self, other):
-        return isinstance(other, Customer) and self.id == other.id
+        return isinstance(other, Customer) and self.user.id == other.user.id
 
     @field_validator('wallet')
     def wallet_check(cls, value):
@@ -49,7 +47,7 @@ class Author(BaseModel):
     user: User
 
     def __eq__(self, other):
-        return isinstance(other, Author) and self.id == other.id
+        return isinstance(other, Author) and self.user.id == other.user.id
 
     class Config:
         from_attributes = True

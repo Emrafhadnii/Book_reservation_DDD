@@ -49,4 +49,8 @@ class SqlAlchemyUserRepository(UserRepository):
             return emailResponsemodel(phone=user.phone, id=user.id, user_role=user.user_role,password=user.user_password)
         else:
             raise ValueError(f"User with phone {phone} not found")
-        
+    
+    async def get_by_phone_all(self, phone) -> UserEntity:
+        result = await self.db.execute(select(User).filter(User.phone == phone))
+        user = result.scalar_one_or_none()
+        return UserEntity.model_validate(user) if user else None

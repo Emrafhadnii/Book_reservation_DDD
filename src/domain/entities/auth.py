@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from src.domain.enums import UserRole
+from typing import Optional
 
 class Token(BaseModel):
     access_token: str
@@ -17,3 +18,15 @@ class emailResponsemodel(LoginRequest):
 class Verifyotp(BaseModel):
     otp_code: str
     user_identifier: str
+
+
+class signup_model(BaseModel):
+    username: str
+    first_name: str
+    last_name: str
+    phone: str
+    user_password: str
+    email: Optional[str] = None
+    user_role: str = "CUSTOMER"
+    sub_model: str = "FREE"
+

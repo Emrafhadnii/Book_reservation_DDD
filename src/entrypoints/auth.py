@@ -8,6 +8,7 @@ from src.services_layer.dependencies.otp_dependency import get_redis
 from redis.asyncio import Redis
 from src.services_layer.otp_service import otp_generator, otp_validator
 from uuid import uuid4
+from src.domain.entities.Users import Customer
 
 
 router = APIRouter(prefix='/login', tags=['login'])
@@ -25,21 +26,16 @@ async def login_route(form_data: LoginRequest, user_repo: UnitOfWork = Depends(g
     await redis.setex(
         name=f"login_identifier:{user_identifier}",
         time=120,
-        value=str(user.id)
+        value=str(user.phone)
         )
 
-    await otp_generator(user.id, redis)
+    otp_code = await otp_generator(user.phone, redis)
 
     return {
         "message": "otp sent",
-        "identifier": user_identifier
+        "user_identifier": user_identifier,
+        "otp_code": otp_code
             }
-    # return {
-    #     "access_token": JWTService.create_access_token({
-    #     "sub": str(user.id),"phone": user.phone,"role": user.user_role}),        
-    #     "refresh_token": JWTService.create_refresh_token({
-    #         "sub": str(user.id)}),"token_type": "bearer"
-    #         }
 
 
 @router.post("/refresh")
@@ -52,18 +48,19 @@ async def refresh_token(refresh_token: str):
 @router.post("/verify-otp/")
 async def verify_otp(verifyotp: Verifyotp, redis: Redis = Depends(get_redis), uow: UnitOfWork = Depends(get_uow)):
     
-    user_id = await redis.get(f"login_identifier:{verifyotp.user_identifier}")
-    if not user_id:
+    user_phone = await redis.get(f"login_identifier:{verifyotp.user_identifier}")
+    if not user_phone:
         raise HTTPException(400, "identifier expired or invalid")
 
-    print(user_id)
-    print(verifyotp.user_identifier)
-    print(verifyotp.otp_code)
-
-    if not await otp_validator(user_identifier=user_id, otp=verifyotp.otp_code, redis=redis):
+    if not await otp_validator(user_identifier=user_phone, otp=verifyotp.otp_code, redis=redis):
         raise HTTPException(400, "Invalid OTP")
     
-    user = await uow.user.get_by_id(int(user_id))
+    await uow.commit()
+
+    user = await uow.user.get_by_phone_all(user_phone)
+    if await uow.customer.get_by_id(user.id) is None:
+        customer = Customer(user=user)
+        await uow.customer.add(customer)
 
     return {
     "access_token": JWTService.create_access_token({
