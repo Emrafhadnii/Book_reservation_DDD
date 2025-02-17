@@ -7,12 +7,17 @@ from redis.asyncio import Redis
 from src.services_layer.dependencies.otp_dependency import get_redis
 from uuid import uuid4
 from src.services_layer.otp_service import otp_generator
+from src.services_layer.dependencies.bus_dependency import get_message_bus
+from src.services_layer.messagebus import RabbitMQMessageBus
+
+
 
 router = APIRouter(prefix='/sign_up',tags=['sign_up'])
 
 
 @router.post('/')
-async def sign_up(model: signup_model, repos: UnitOfWork = Depends(get_uow), redis: Redis = Depends(get_redis)):
+async def sign_up(model: signup_model, repos: UnitOfWork = Depends(get_uow), redis: Redis = Depends(get_redis),
+                  bus: RabbitMQMessageBus = Depends(get_message_bus)):
     try:
         user_repo = repos.user
         customer_repo = repos.customer

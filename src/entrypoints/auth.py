@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.domain.entities.auth import LoginRequest, Token, Verifyotp
 from src.services_layer.JWT import JWTService
-from src.adapters.repositories.UserRepository import SqlAlchemyUserRepository
 from src.services_layer.dependencies.userauth import get_uow
 from src.adapters.repositories.GenericUOW import UnitOfWork
 from src.services_layer.dependencies.otp_dependency import get_redis
 from redis.asyncio import Redis
+from src.services_layer.dependencies.bus_dependency import get_message_bus
+from src.services_layer.messagebus import RabbitMQMessageBus
 from src.services_layer.otp_service import otp_generator, otp_validator
 from uuid import uuid4
-from src.domain.entities.Users import Customer
-
+from src.domain.events import Events
 
 router = APIRouter(prefix='/login', tags=['login'])
 
@@ -46,7 +46,8 @@ async def refresh_token(refresh_token: str):
 
 
 @router.post("/verify-otp/")
-async def verify_otp(verifyotp: Verifyotp, redis: Redis = Depends(get_redis), uow: UnitOfWork = Depends(get_uow)):
+async def verify_otp(verifyotp: Verifyotp, redis: Redis = Depends(get_redis), 
+                    uow: UnitOfWork = Depends(get_uow), bus = Depends(get_message_bus)):
     
     user_phone = await redis.get(f"login_identifier:{verifyotp.user_identifier}")
     if not user_phone:
@@ -58,9 +59,9 @@ async def verify_otp(verifyotp: Verifyotp, redis: Redis = Depends(get_redis), uo
     await uow.commit()
 
     user = await uow.user.get_by_phone_all(user_phone)
-    if await uow.customer.get_by_id(user.id) is None:
-        customer = Customer(user=user)
-        await uow.customer.add(customer)
+
+    await Events.usercreated_event(bus,user.model_dump_json())
+    
 
     return {
     "access_token": JWTService.create_access_token({

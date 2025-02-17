@@ -11,8 +11,8 @@ async def create():
             database=settings.DB_NAME
         )
         # await conn.execute('CREATE DATABASE books_db;')
-        # await conn.execute('DELETE FROM users WHERE id = 19;')
-        x = await conn.fetch('SELECT * FROM customers;')
+        # await conn.execute('DELETE FROM users WHERE id = 38;')
+        x = await conn.fetch('SELECT * FROM users;')
         print(x)
     except asyncpg.DuplicateDatabaseError as e:
         raise Exception(str(e))

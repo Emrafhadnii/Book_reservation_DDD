@@ -29,7 +29,7 @@ class User(Base):
     username = Column(String(50), unique=True, nullable=False)
     first_name = Column(String(50))
     last_name = Column(String(50))
-    phone = Column(String(13))
+    phone = Column(String(13), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     user_password = Column(String(100), nullable=False)
     user_role = Column(Enum(UserRole), nullable=False)
