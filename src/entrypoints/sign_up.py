@@ -20,7 +20,6 @@ async def sign_up(model: signup_model, repos: UnitOfWork = Depends(get_uow), red
                   bus: RabbitMQMessageBus = Depends(get_message_bus)):
     try:
         user_repo = repos.user
-        customer_repo = repos.customer
         
         user = User(username=model.username,first_name=model.first_name,last_name=model.last_name,
                     user_password=model.user_password,email=model.email,phone=model.phone,user_role=model.user_role)

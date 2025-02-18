@@ -6,14 +6,14 @@ from contextlib import asynccontextmanager
 from src.services_layer.dependencies.otp_dependency import redis_dependency
 from src.entrypoints.sign_up import router as signup_router
 from src.services_layer.dependencies.bus_dependency import messagebus
-from src.services_layer.subscribers import Subscribers
+from src.services_layer.consumers import Consumers
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_dependency.connect()
     await messagebus.connect()
-    await Subscribers.subs_usercreated(messagebus)
+    await Consumers.comsuming_queues(messagebus)
 
     yield
     

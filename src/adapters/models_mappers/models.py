@@ -17,8 +17,8 @@ class Book(Base):
     units = Column(Integer, nullable=False)
     author_id = Column(Integer, ForeignKey('authors.id'))
 
-    authors = relationship("Author", back_populates="books", secondary="book_author", cascade="all, delete", lazy=('selectin'))
-    reservations = relationship("Reservation", back_populates="book")
+    authors = relationship("Author", back_populates="books", secondary="book_author", lazy=('selectin'))
+    reservations = relationship("Reservation", back_populates="book", cascade="all, delete")
 
    
 
@@ -34,8 +34,8 @@ class User(Base):
     user_password = Column(String(100), nullable=False)
     user_role = Column(Enum(UserRole), nullable=False)
     
-    author = relationship("Author", back_populates="user", uselist=False, cascade="all, delete-orphan")
-    customer = relationship("Customer", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    author = relationship("Author", back_populates="user", uselist=False, cascade="all, delete")
+    customer = relationship("Customer", back_populates="user", uselist=False, cascade="all, delete")
 
 
 
@@ -50,8 +50,8 @@ class Reservation(Base):
     end_time = Column(TIMESTAMP, nullable=False)
     price = Column(Integer, default=0)
 
-    customer = relationship("Customer", back_populates="reservations", cascade="all, delete", lazy=('selectin'))
-    book = relationship("Book", back_populates="reservations", cascade="all, delete", lazy=('selectin'))
+    customer = relationship("Customer", back_populates="reservations", lazy=('selectin'))
+    book = relationship("Book", back_populates="reservations", lazy=('selectin'))
 
 
 
@@ -95,7 +95,7 @@ class Author(Base):
     goodreads_link = Column(String(200))
     bank_account = Column(String(50))
 
-    books = relationship("Book", secondary="book_author", back_populates="authors")
+    books = relationship("Book", secondary="book_author", back_populates="authors", cascade="all, delete")
     user = relationship("User", back_populates="author", uselist=False)
     city = relationship("City", back_populates="authors", uselist=False)
 
