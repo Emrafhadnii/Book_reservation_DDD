@@ -31,10 +31,12 @@ class SqlAlchemyCustomerRepository(CustomerRepository):
         customer = result.scalar_one_or_none()
         return CustomerEntity.model_validate(customer) if customer else None
     
-    async def get_all(self) -> List[CustomerEntity]:
-        result = await self.db.execute(select(CustomerSQL))
+    async def get_all(self, page: int = 1, per_page: int = 5) -> List[CustomerEntity]:
+        offset = (page - 1) * per_page
+        result = await self.db.execute(select(CustomerSQL).limit(per_page).offset(offset))
         customers_list = result.scalars().all()
-        return list(map(CustomerEntity.model_validate,customers_list))
+        return list(map(CustomerEntity.model_validate, customers_list))
+
     
     async def change_subscription(self, id:int, new_model:SubscriptionModel, end_date:datetime) -> None:
         result = await self.db.execute(select(CustomerSQL).filter(CustomerSQL.id == id))

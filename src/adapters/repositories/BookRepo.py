@@ -26,13 +26,6 @@ class SqlAlchemyBookRepository(BookRepository):
     async def update(self, book : BookEntity) -> None:
         bookSQL = Bookmapper.to_SQL(book)
         await self.db.merge(bookSQL)
-        # result = await self.db.execute(select(BookSQL).where(BookSQL.id == book.id))
-        # existing_book = result.scalar_one()
-
-        # for field in vars(bookSQL).keys():
-        #     if hasattr(existing_book, field) and field != "id":
-        #         new_value = getattr(bookSQL, field)
-        #         setattr(existing_book, field, new_value)
     
     async def delete(self, id : int) -> None:
         result = await self.db.execute(select(BookSQL).filter(BookSQL.id == id))
@@ -45,16 +38,16 @@ class SqlAlchemyBookRepository(BookRepository):
         book = result.scalar_one_or_none()
         return BookEntity.model_validate(book) if book else None
     
-    async def get_all(self) -> List[BookEntity]:
-        result = await self.db.execute(select(BookSQL))
+    async def get_all(self, page: int = 1, per_page: int = 5) -> List[BookEntity]:
+        offset = (page-1)*per_page
+        result = await self.db.execute(select(BookSQL).limit(per_page).offset(offset))
         books_list = result.scalars().all()
         return list(map(BookEntity.model_validate,books_list))
-    
+
     async def stock_update(self, id: int, new_stock: int) -> None:
         result = await self.db.execute(select(BookSQL).filter(BookSQL.id == id))
         book = result.scalar_one_or_none()
         if book:
-            # book.units += new_stock
             bookentity = BookEntity.model_validate(book)
             bookentity.units += new_stock
             await self.update(bookentity)

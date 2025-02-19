@@ -39,8 +39,9 @@ async def login_route(form_data: LoginRequest, user_repo: UnitOfWork = Depends(g
 
 
 @router.post("/refresh")
-async def refresh_token(refresh_token: str):
-    payload = JWTService.decode_token(refresh_token)
+async def refresh_token(refresh_token: dict):
+    
+    payload = JWTService.decode_token(refresh_token['refresh_token'])
     new_access_token = JWTService.create_access_token({"sub": payload.get("sub")})
     return {"access_token": new_access_token}
 

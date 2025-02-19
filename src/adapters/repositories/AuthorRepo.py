@@ -24,10 +24,11 @@ class SqlAlchemyAuthorRepository(AuthorRepository):
         if author_to_delete:
             await self.db.delete(author_to_delete)
 
-    async def get_all(self) -> List[AuthorEntity]:
-        result = await self.db.execute(select(AuthorSQL))
+    async def get_all(self, page: int = 1, per_page: int = 5) -> List[AuthorEntity]:
+        offset = (page-1)*per_page
+        result = await self.db.execute(select(AuthorSQL).limit(per_page).offset(offset))
         authors_list = result.scalars().all()
-        return list(map(AuthorEntity.model_validate,authors_list))
+        return list(map(AuthorEntity.model_validate, authors_list))
 
     async def get_by_id(self, id: int) -> Optional[AuthorEntity]:
         result = await self.db.execute(select(AuthorSQL).filter(AuthorSQL.id == id))

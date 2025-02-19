@@ -16,10 +16,12 @@ class SqlAlchemyUserRepository(UserRepository):
         user = result.scalar_one_or_none()
         return UserEntity.model_validate(user)
     
-    async def get_all(self) -> List[UserEntity]:
-        result = await self.db.execute(select(User))
+    async def get_all(self, page: int = 1, per_page: int = 5) -> List[UserEntity]:
+        offset = (page - 1) * per_page
+        result = await self.db.execute(select(User).limit(per_page).offset(offset))
         users_list = result.scalars().all()
-        return list(map(UserEntity.model_validate,users_list))
+        return list(map(UserEntity.model_validate, users_list))
+
 
     async def delete(self, id: int) -> None:
         result = await self.db.execute(select(User).filter(User.id == id))

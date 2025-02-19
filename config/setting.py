@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     REIDIS_HOST:str
     REIDIS_PASS:str
     REIDIS_PORT:int
+    RabbitURL: str
     class Config:
         env_file = "/home/emrafhadnii/Python/fastenv/Task3/config/.env"
 

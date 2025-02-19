@@ -2,9 +2,6 @@ import json
 from aio_pika import connect, Message, ExchangeType
 from typing import Callable, Dict, Any
 
-
-
-
 class RabbitMQMessageBus():
     def __init__(self, connection_str: str):
         self.connection_str = connection_str
@@ -22,13 +19,8 @@ class RabbitMQMessageBus():
     async def publish(self, topic: str, message: Dict[str, Any], priority: int = 0):
         exchange = await self._get_exchange(topic)
         await exchange.publish(
-            Message(
-                body=json.dumps(message).encode(),
-                priority=priority,
-                delivery_mode=1
-            ),
-            routing_key=topic
-        )
+            Message(body=json.dumps(message).encode(),priority=priority,delivery_mode=1),
+            routing_key=topic)
 
     async def subscribe(self, topic: str, callback: Callable[[Dict[str, Any]], Any]):
         exchange = await self._get_exchange(topic)
@@ -54,8 +46,6 @@ class RabbitMQMessageBus():
         else:
             await queue.consume(lambda msg: self._handle_message(msg, callback))
         
-
-
     async def _get_queues(self, topic: str):
         if topic not in self.queues:
             self.queues[topic] = {}

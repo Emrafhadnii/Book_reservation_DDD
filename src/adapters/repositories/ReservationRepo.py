@@ -30,10 +30,11 @@ class SqlAlchemyReservationRepository(ReservationRepository):
         resrvation = result.scalar_one_or_none()
         return ReservationEntity.model_validate(resrvation)   
     
-    async def get_all(self) -> List[ReservationEntity]:
-        result = await self.db.execute(select(ReservationSQL))
+    async def get_all(self, page: int = 1, per_page: int = 5) -> List[ReservationEntity]:
+        offset = (page - 1) * per_page
+        result = await self.db.execute(select(ReservationSQL).limit(per_page).offset(offset))
         reservations_list = result.scalars().all()
-        return list(map(ReservationEntity.model_validate,reservations_list))
+        return list(map(ReservationEntity.model_validate, reservations_list))
 
     async def delete_ended_reservations(self) -> None:
         result = await self.db.execute(select(ReservationSQL.id).filter(ReservationSQL.end_time < datetime.now()))
