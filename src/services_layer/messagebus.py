@@ -1,7 +1,5 @@
 import json
 from aio_pika import connect, Message, ExchangeType
-from aio_pika.queue import Queue
-from aio_pika.message import IncomingMessage
 from typing import Callable, Dict, Any
 
 class RabbitMQMessageBus():
@@ -10,69 +8,27 @@ class RabbitMQMessageBus():
         self.connection = None
         self.channel = None
         self.exchanges = {}
-        self.queues = {}
 
     async def connect(self):
         self.connection = await connect(self.connection_str)
         self.channel = await self.connection.channel()
-        await self.channel.set_qos(prefetch_count=1)
         return self
 
     async def publish(self, topic: str, message: Dict[str, Any], priority: int = 0):
         exchange = await self._get_exchange(topic)
         await exchange.publish(
-            Message(body=json.dumps(message).encode(),priority=priority,delivery_mode=1),
-            routing_key=topic)
+            Message(
+                body=json.dumps(message).encode(),
+                priority=priority
+            ),
+            routing_key=topic
+        )
 
     async def subscribe(self, topic: str, callback: Callable[[Dict[str, Any]], Any]):
         exchange = await self._get_exchange(topic)
-        queue = await self._get_queues(topic)
+        queue = await self.channel.declare_queue(exclusive=True)
         await queue.bind(exchange, routing_key=topic)
-        self.queues[topic]['callback'] = callback
-
-    async def consume_queue(self, topic: str):
-        if topic not in self.queues:
-            raise ValueError(f"No queue found for topic: {topic}")
-        queue = self.queues[topic]['queue']
-        callback = self.queues[topic]['callback']
-        if topic == "reservation_queue":
-            message = await queue.get(no_ack=False)
-            if message:
-                try:
-                    async with message.process():
-                        data = json.loads(message.body.decode())
-                        await callback(data)
-                        await message.ack()
-                except Exception as e:
-                    await message.nack(requeue=False)
-        else:
-            await queue.consume(lambda msg: self._handle_message(msg, callback))
-        
-    async def dequeue(self,topic: str, target_message: dict):
-        queue = self.queues[topic]['queue']
-        print("\n\n\n\n\n\nwe are here\n\n\n\n")
-        while True:
-            message = await queue.get(no_ack=False)
-            async with message.process():
-                if message:
-                    data = json.loads(message.body.decode())
-                    print(data)
-                    print(target_message)
-                    if data == target_message:
-                        print("\n\n\n\n\n\nyoyoyoyoyoyoyoyo\n\n\n\n")
-                        await message.nack(requeue=False)
-                        break
-                    else:
-                        await message.nack(requeue=True)
-    async def _get_queues(self, topic: str):
-        if topic not in self.queues:
-            self.queues[topic] = {}
-            self.queues[topic]['queue'] = await self.channel.declare_queue(
-            name=topic,
-            exclusive=True,
-            arguments={'x-max-priority': 3}
-            )
-        return self.queues[topic]['queue']
+        await queue.consume(lambda msg: self._handle_message(msg, callback))
 
     async def _get_exchange(self, topic: str):
         if topic not in self.exchanges:
@@ -82,9 +38,6 @@ class RabbitMQMessageBus():
         return self.exchanges[topic]
 
     async def _handle_message(self, message, callback):
-        try:
-            async with message.process():
-                data = json.loads(message.body.decode())
-                await callback(data)
-        except Exception as e:
-            pass
+        async with message.process():
+            data = json.loads(message.body.decode())
+            await callback(data)

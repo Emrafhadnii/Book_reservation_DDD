@@ -6,6 +6,9 @@ from datetime import datetime,timedelta
 from src.domain.entities.Reservations import Reservation
 from src.domain.events import Events
 from asyncio.locks import Lock
+from redis import Redis
+from src.services_layer.dependencies.otp_dependency import get_redis
+from src.services_layer.reservation_queue import add_user_to_queue
 
 lock = Lock()
 
@@ -13,7 +16,7 @@ router = APIRouter(prefix='/book',tags=['reservation'])
 
 @router.post('/reserve/{book_id}')
 async def reserve_book(book_id: int, repos:UnitOfWork = Depends(get_uow),
-                        token = Depends(get_current_user), bus = Depends(get_message_bus)):
+                        token = Depends(get_current_user), bus = Depends(get_message_bus), redis: Redis = Depends(get_redis)):
     try:
         user_id = int(token["user_id"])
         book_repo = repos.book
@@ -47,7 +50,10 @@ async def reserve_book(book_id: int, repos:UnitOfWork = Depends(get_uow),
                 "book_id": book_id,
                 "sub_model": customer.sub_model
             }
-            await Events.userenqueued_event(bus=bus,message=message) 
+            await add_user_to_queue(message=message)
+            return {
+                "messgae":"The book is not available but you have been added to the reservation queue"
+            }
     except Exception as e:
         raise HTTPException(400,detail=[str(e)])
 
@@ -64,12 +70,14 @@ async def return_book(reservation_id: int, repos: UnitOfWork = Depends(get_uow),
         time_difference = reserved_book.end_time - datetime.now() 
         new_price = reserved_book.price - (time_difference.days * 1000)
         reserved_book_count = reserved_book.book.units
-        reserved_book_id = reserved_book.id
+        reserved_book_id = reserved_book.book.id
         await customer.add_to_wallet(reserved_book.customer.user.id,new_price)        
         await book.stock_update(reserved_book.book.id,1)        
         await reservation.delete(reservation_id)
     if reserved_book_count == 0:
         await Events.bookisavailable_event(bus=bus,book_id=reserved_book_id)
-
     else:
         raise HTTPException(404,detail=['reservation not found'])
+    return {
+        "messgae":"book returned correctly"
+        }

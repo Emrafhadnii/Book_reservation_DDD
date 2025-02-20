@@ -8,6 +8,9 @@ from src.domain.entities.Reservations import cancel_queued_reservation
 from src.services_layer.messagebus import RabbitMQMessageBus
 from src.services_layer.dependencies.bus_dependency import get_message_bus
 from fastapi import HTTPException
+from src.services_layer.dependencies.otp_dependency import get_redis
+from redis import Redis
+from src.services_layer.reservation_queue import remove_user_from_queue
 
 router = APIRouter(prefix='/reservation', tags=['reservation'])
 
@@ -40,9 +43,8 @@ async def delete_user(reservation_id: int, repos: UnitOfWork = Depends(get_uow),
 
 @router.put('/cancel-queue')
 async def cancel(user_to_dequeue: cancel_queued_reservation, repos: UnitOfWork = Depends(get_uow),
-                token = Depends(get_current_user), bus: RabbitMQMessageBus = Depends(get_message_bus)):
-    # print(user_to_dequeue.user_id)
-    # print(token)
+                token = Depends(get_current_user), redis: Redis = Depends(get_redis)):
+
     if (token['role'] == "ADMIN") or (user_to_dequeue.user_id) == int(token['user_id']):
         try:
             customer = await repos.customer.get_by_id(user_to_dequeue.user_id)
@@ -51,7 +53,14 @@ async def cancel(user_to_dequeue: cancel_queued_reservation, repos: UnitOfWork =
                 "book_id":user_to_dequeue.book_id,
                 "sub_model":customer.sub_model
             }
-            await bus.dequeue("reservation_queue",message)
+            if await remove_user_from_queue(message):
+                return {
+                    "messgae":"removed from queue"
+                }
+            else:
+                return {
+                    "messgae":"does not removed from queue"
+                }
         except Exception as e:
             raise HTTPException(408,detail="wtf")
         

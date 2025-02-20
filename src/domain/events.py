@@ -1,6 +1,7 @@
 from src.domain.entities.Users import User
 from src.services_layer.messagebus import RabbitMQMessageBus
 from src.domain.handlers import Handlers
+from redis import Redis
 
 
 class Events:
@@ -18,13 +19,3 @@ class Events:
             message={"book_id": book_id}
         )
         
-    async def userenqueued_event(bus: RabbitMQMessageBus, message: dict):
-        if message['sub_model'] == "PREMIUM":
-            priority = 2 
-        elif message['sub_model'] == "PLUS":
-            priority = 1
-        await bus.publish(
-            topic="reservation_queue",
-            message=message,
-            priority=priority
-        )
