@@ -9,7 +9,7 @@ from src.services_layer.consumers import Consumers
 from src.entrypoints.book_router import router as book_router
 from src.entrypoints.user_router import router as user_router
 from src.entrypoints.customer_router import router as customer_router
-
+from src.entrypoints.reservation_router import router as reservation_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,4 +32,5 @@ app.include_router(auth_router)
 app.include_router(reserve_router)
 app.include_router(user_router)
 app.include_router(customer_router)
+app.include_router(reservation_router)
 

@@ -9,7 +9,7 @@ async def insert():
             host=settings.DB_HOST,
             database=settings.DB_NAME
         )
-        with open('/home/emrafhadnii/Python/fastenv/Task3/setup_db/sample.sql', 'r') as file:
+        with open('/app/setup_db/sample.sql', 'r') as file:
             sql = file.read()
         await conn.execute(sql)
     except Exception as e:

@@ -1,5 +1,7 @@
 import json
 from aio_pika import connect, Message, ExchangeType
+from aio_pika.queue import Queue
+from aio_pika.message import IncomingMessage
 from typing import Callable, Dict, Any
 
 class RabbitMQMessageBus():
@@ -34,7 +36,7 @@ class RabbitMQMessageBus():
         queue = self.queues[topic]['queue']
         callback = self.queues[topic]['callback']
         if topic == "reservation_queue":
-            message = await queue.get()
+            message = await queue.get(no_ack=False)
             if message:
                 try:
                     async with message.process():
@@ -46,6 +48,22 @@ class RabbitMQMessageBus():
         else:
             await queue.consume(lambda msg: self._handle_message(msg, callback))
         
+    async def dequeue(self,topic: str, target_message: dict):
+        queue = self.queues[topic]['queue']
+        print("\n\n\n\n\n\nwe are here\n\n\n\n")
+        while True:
+            message = await queue.get(no_ack=False)
+            async with message.process():
+                if message:
+                    data = json.loads(message.body.decode())
+                    print(data)
+                    print(target_message)
+                    if data == target_message:
+                        print("\n\n\n\n\n\nyoyoyoyoyoyoyoyo\n\n\n\n")
+                        await message.nack(requeue=False)
+                        break
+                    else:
+                        await message.nack(requeue=True)
     async def _get_queues(self, topic: str):
         if topic not in self.queues:
             self.queues[topic] = {}

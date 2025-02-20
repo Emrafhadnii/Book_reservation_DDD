@@ -11,6 +11,7 @@ router = APIRouter(prefix='/customer', tags=['customer'])
 @router.get("/")
 async def get_customers(repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),
                         page: int = Query(1, ge=1), per_page: int = Query(5, ge=5)):
+    print(token)
     if token['role'] == "ADMIN":
         customer_repo = repos.customer
         customers = await customer_repo.get_all(page, per_page)

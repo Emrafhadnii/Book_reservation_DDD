@@ -14,7 +14,7 @@ class Handlers:
         async with UnitOfWork() as uow:
             user_data = json.loads(message["user"])
             user = User(**user_data)
-            if await uow.customer.get_by_id(user.id):
+            if await uow.customer.get_by_id(user.id) or user.user_role != "CUSTOMER":
                 return
             customer = Customer(user=user)
             await uow.customer.add(customer=customer)

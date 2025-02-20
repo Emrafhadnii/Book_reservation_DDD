@@ -5,7 +5,9 @@ from src.adapters.repositories.GenericUOW import UnitOfWork
 from datetime import datetime,timedelta
 from src.domain.entities.Reservations import Reservation
 from src.domain.events import Events
+from asyncio.locks import Lock
 
+lock = Lock()
 
 router = APIRouter(prefix='/book',tags=['reservation'])
 
@@ -24,18 +26,19 @@ async def reserve_book(book_id: int, repos:UnitOfWork = Depends(get_uow),
         reservation_time = 0
 
         if book.units > 0:
-            if customer.wallet >= base_price and await customer_repo.check_subs(customer=customer):
-                if customer.sub_model == "PLUS":    
-                    await customer_repo.add_to_wallet(customer.user.id,-base_price)
-                    reservation_time = 1
-                if customer.sub_model == "PREMIUM" and customer.wallet >= 2*base_price:
-                    await customer_repo.add_to_wallet(customer.user.id, -2*base_price)
-                    reservation_time = 2
+            async with lock:
+                if customer.wallet >= base_price and await customer_repo.check_subs(customer=customer):
+                    if customer.sub_model == "PLUS":    
+                        await customer_repo.add_to_wallet(customer.user.id,-base_price)
+                        reservation_time = 1
+                    if customer.sub_model == "PREMIUM" and customer.wallet >= 2*base_price:
+                        await customer_repo.add_to_wallet(customer.user.id, -2*base_price)
+                        reservation_time = 2
 
-            if reservation_time > 0:
-                await book_repo.stock_update(book_id,-1)
-            reservation = Reservation(customer=customer,book=book,start_time=datetime.now(),end_time=datetime.now() + timedelta(reservation_time*7),price=reservation_time*7000)
-            await reservation_repo.add(reservation=reservation)
+                if reservation_time > 0:
+                    await book_repo.stock_update(book_id,-1)
+                reservation = Reservation(customer=customer,book=book,start_time=datetime.now(),end_time=datetime.now() + timedelta(reservation_time*7),price=reservation_time*7000)
+                await reservation_repo.add(reservation=reservation)
 
             return {"message":"correct,reservation"}
         else:
@@ -44,9 +47,7 @@ async def reserve_book(book_id: int, repos:UnitOfWork = Depends(get_uow),
                 "book_id": book_id,
                 "sub_model": customer.sub_model
             }
-            await Events.userenqueued_event(bus=bus,message=message)
-
-            pass       
+            await Events.userenqueued_event(bus=bus,message=message) 
     except Exception as e:
         raise HTTPException(400,detail=[str(e)])
 
@@ -72,6 +73,3 @@ async def return_book(reservation_id: int, repos: UnitOfWork = Depends(get_uow),
 
     else:
         raise HTTPException(404,detail=['reservation not found'])
-    
-
-    

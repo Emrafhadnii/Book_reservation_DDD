@@ -1,0 +1,112 @@
+networks:
+    app-network:
+      driver: bridge
+services:
+
+  app:
+    build: 
+      dockerfile: Dockerfile
+    
+    restart: on-failure
+
+    container_name: Book_reservation_app
+    # env_file:
+    #   - .env
+    # environment:
+    #   DB_USER: ${DB_USER}
+    #   DB_PASSWORD: ${DB_PASSWORD}
+    #   DB_HOST: ${DB_HOST}
+    #   DB_NAME: ${DB_NAME}
+    #   DB_PORT: ${DB_PORT}
+    #   SECRET_KEY: ${SECRET_KEY}
+    #   ALGORITHM: ${ALGORITHM}
+    #   ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+    #   REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS}
+    #   REDIS_HOST: ${REIDIS_HOST}
+    #   REDIS_PASS: ${REIDIS_PASS}
+    #   REDIS_PORT: ${REIDIS_PORT}
+    #   RABBITMQ_USER: ${RABBITMQ_USER}
+    #   RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    #   RabbitURL: ${RabbitURL}
+    #   MONGO_USER: ${MONGO_USER}
+    #   MONGO_PASSWORD: ${MONGO_PASSWORD}
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - redis
+      - postgres
+      
+    ports:
+      - "8000:8000"
+    command: >
+      bash -c "alembic upgrade head &&
+              python insert_sample.py &&
+              python config.py"
+    networks:
+      - app-network
+
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    env_file: .env
+    environment:
+      POSTGRES_USER: mahdi
+      POSTGRES_PASSWORD: Mahdi1383
+      POSTGRES_DB: books_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    restart: always
+
+  rabbitmq:
+    image: "rabbitmq:management"
+    container_name: rabbitmq
+    env_file: .env
+    environment:
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    ports:
+      - "15673:15672"
+      - "5673:5672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app-network
+    restart: always
+  redis:
+    image: redis:latest
+    container_name: redis
+    env_file: .env
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    restart: always
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+    restart: always
+
+  
+volumes:
+  postgres_data:
+  redis_data:
+  mongodb_data:
+  rabbitmq_data:    
+
