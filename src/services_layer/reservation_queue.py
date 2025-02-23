@@ -1,6 +1,6 @@
-import redis
+from redis import Redis
 from time import time
-from src.services_layer.dependencies.otp_dependency import redis_dependency
+from src.adapters.dependencies.otp_dependency import redis_dependency
 
 QUEUE_NAME = "reservation_queue"
 

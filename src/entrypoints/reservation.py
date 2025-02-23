@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
-from src.services_layer.dependencies.userauth import get_uow,get_current_user
-from src.services_layer.dependencies.bus_dependency import get_message_bus
+from src.adapters.dependencies.userauth import get_uow,get_current_user
+from src.adapters.dependencies.bus_dependency import get_message_bus
 from src.adapters.repositories.GenericUOW import UnitOfWork
 from datetime import datetime,timedelta
 from src.domain.entities.Reservations import Reservation
 from src.domain.events import Events
 from asyncio.locks import Lock
 from redis import Redis
-from src.services_layer.dependencies.otp_dependency import get_redis
+from src.adapters.dependencies.otp_dependency import get_redis
 from src.services_layer.reservation_queue import add_user_to_queue
 
 lock = Lock()

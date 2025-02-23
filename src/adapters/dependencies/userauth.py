@@ -1,7 +1,6 @@
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from src.services_layer.JWT import JWTService
-# from src.services_layer.RepositoriesUOW import UserUoW,BookUoW,CustomerUoW,ReservationUoW,AuthorUoW
 from src.adapters.repositories.GenericUOW import UnitOfWork
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.adapters.repositories.UserRepository import SqlAlchemyUserRepository

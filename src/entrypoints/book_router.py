@@ -1,19 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
-from src.domain.entities.auth import LoginRequest, Token
-from src.services_layer.JWT import JWTService
-from src.adapters.repositories.BookRepo import SqlAlchemyBookRepository
-from src.services_layer.dependencies.userauth import get_uow,get_current_user
-from src.services_layer.dependencies.bus_dependency import get_message_bus
+from src.adapters.dependencies.userauth import get_uow,get_current_user
 from src.adapters.repositories.GenericUOW import UnitOfWork
-from datetime import datetime, UTC, timedelta
-from src.domain.entities.Users import User, Customer
 from src.domain.entities.Books import Book
-from src.domain.entities.Reservations import Reservation
-from src.adapters.models_mappers.Usermapper import Usermapper
-from src.adapters.models_mappers.Bookmapper import Bookmapper
-from src.adapters.models_mappers.Customermapper import Customermapper
-from src.adapters.models_mappers.Reservationmapper import Reservationmapper
-from src.domain.events import Events
 
 
 router = APIRouter(prefix='/book',tags=['book'])

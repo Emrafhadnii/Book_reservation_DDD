@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, UTC
 from fastapi import HTTPException, status
-from config.setting import settings
+from src.config.setting import settings
 from jose import jwt,ExpiredSignatureError
 
 class JWTService:

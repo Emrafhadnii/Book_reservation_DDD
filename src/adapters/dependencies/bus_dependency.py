@@ -1,5 +1,5 @@
 from src.services_layer.messagebus import RabbitMQMessageBus
-from config.setting import settings
+from src.config.setting import settings
 
 messagebus = RabbitMQMessageBus(settings.RabbitURL)
 

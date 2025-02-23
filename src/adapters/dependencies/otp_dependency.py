@@ -1,5 +1,5 @@
 from redis.asyncio import Redis
-from config.setting import settings
+from src.config.setting import settings
 
 class RedisDependency:
     def __init__(self):

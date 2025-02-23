@@ -1,4 +1,4 @@
-from src.services_layer.dependencies.userauth import get_uow,get_current_user
+from src.adapters.dependencies.userauth import get_uow,get_current_user
 from fastapi import APIRouter, Depends, Query, HTTPException
 from src.adapters.repositories.GenericUOW import UnitOfWork
 from src.domain.entities.Users import User

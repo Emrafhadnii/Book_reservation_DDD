@@ -1,14 +1,10 @@
-from src.services_layer.dependencies.userauth import get_uow,get_current_user
+from src.adapters.dependencies.userauth import get_uow,get_current_user
 from fastapi import APIRouter, Depends, Query, HTTPException
 from src.adapters.repositories.GenericUOW import UnitOfWork
-from src.domain.entities.Users import User
 from src.domain.entities.Reservations import Reservation
-from datetime import datetime, timedelta
 from src.domain.entities.Reservations import cancel_queued_reservation
-from src.services_layer.messagebus import RabbitMQMessageBus
-from src.services_layer.dependencies.bus_dependency import get_message_bus
 from fastapi import HTTPException
-from src.services_layer.dependencies.otp_dependency import get_redis
+from src.adapters.dependencies.otp_dependency import get_redis
 from redis import Redis
 from src.services_layer.reservation_queue import remove_user_from_queue
 

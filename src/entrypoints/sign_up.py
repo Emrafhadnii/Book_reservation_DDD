@@ -1,13 +1,13 @@
 from fastapi import Depends, APIRouter, HTTPException
 from src.domain.entities.auth import signup_model
-from src.services_layer.dependencies.userauth import get_uow
+from src.adapters.dependencies.userauth import get_uow
 from src.adapters.repositories.GenericUOW import UnitOfWork
 from src.domain.entities.Users import User
 from redis.asyncio import Redis
-from src.services_layer.dependencies.otp_dependency import get_redis
+from src.adapters.dependencies.otp_dependency import get_redis
 from uuid import uuid4
 from src.services_layer.otp_service import otp_generator
-from src.services_layer.dependencies.bus_dependency import get_message_bus
+from src.adapters.dependencies.bus_dependency import get_message_bus
 from src.services_layer.messagebus import RabbitMQMessageBus
 
 
