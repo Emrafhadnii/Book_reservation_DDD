@@ -12,7 +12,7 @@ class BookHandler:
     async def bookisavailable_handler(message: dict):
         sleep(2)
         user = await reservation_queue.get_next_user(int(message['book_id']))
-        book_id = int(user['book_id'])
+        book_id = int(message['book_id'])
         user_id = int(user['user_id'])
         async with UnitOfWork() as uow:
             base_price = 7000
