@@ -10,13 +10,16 @@ from src.books.entrypoints.book_router import router as book_router
 from src.users.entrypoints.user_router import router as user_router
 from src.users.entrypoints.customer_router import router as customer_router
 from src.reservations.entrypoints.reservation_router import router as reservation_router
+from BackgroundWorkers.notification import send_notification
+import asyncio
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_dependency.connect()
     await messagebus.connect()
     await Consumers.comsuming_queues(messagebus)
-
+    asyncio.create_task(send_notification())
+    
     yield
     
     await messagebus.channel.close()

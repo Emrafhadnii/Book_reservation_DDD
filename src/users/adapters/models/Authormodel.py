@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from setup_db.database import Base , mapper_registry
+from src.users.adapters.models.Citymodel import City
 
 class Author(Base):
     __tablename__ = 'authors'

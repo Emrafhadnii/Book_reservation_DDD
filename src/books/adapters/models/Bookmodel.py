@@ -18,3 +18,9 @@ class Book(Base):
 
     authors = relationship("Author", back_populates="books", secondary="book_author", lazy=('selectin'))
     reservations = relationship("Reservation", back_populates="book", cascade="all, delete")
+
+class BookAuthor(Base):
+    __tablename__ = 'book_author'
+
+    book_id = Column(Integer, ForeignKey('books.id', ondelete="CASCADE"),primary_key=True)
+    author_id = Column(Integer, ForeignKey('authors.id',ondelete="CASCADE"), primary_key=True)
