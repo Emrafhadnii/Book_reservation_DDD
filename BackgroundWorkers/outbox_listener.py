@@ -5,8 +5,16 @@ from src.books.adapters.mongo_repositories.Mongo_BookRepo import MongoDBBookRepo
 book_mongo_repo = MongoDBBookRepository()
 
 async def outbox_event_listener():
+    async with UnitOfWork() as uow:
+        books = await uow.book.get_all(1,10)
+        
+        for book in books:
+            await book_mongo_repo.add(book=book)
+
+
     while True:
         async with UnitOfWork() as uow:
+
             events = await uow.outbox.get_all_unprocessed()
             for event in events:
                 try:

@@ -6,3 +6,4 @@ class Consumers:
     async def comsuming_queues(bus: RabbitMQMessageBus):
         await bus.subscribe("user.events",UserHandler.usercreated_handler)
         await bus.subscribe("book_isavailable",BookHandler.bookisavailable_handler)
+        await bus.subscribe("outbox",BookHandler.booktablechanged_event)

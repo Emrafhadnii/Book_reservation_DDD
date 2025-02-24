@@ -12,10 +12,12 @@ class BookHandler:
     async def bookisavailable_handler(message: dict):
         sleep(2)
         user = await reservation_queue.get_next_user(int(message['book_id']))
+        book_id = int(user['book_id'])
+        user_id = int(user['user_id'])
         async with UnitOfWork() as uow:
             base_price = 7000
-            customer = await uow.customer.get_by_id(int(user['user_id']))
-            book = await uow.book.get_by_id(int(user['book_id']))
+            customer = await uow.customer.get_by_id(user_id)
+            book = await uow.book.get_by_id(book_id)
             reservation_time = 0
             if book.units > 0:
                 async with lock:
