@@ -1,9 +1,16 @@
 from logging.config import fileConfig
-
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from src.adapters.models_mappers.models import Base
 from alembic import context
+from src.books.adapters.models.Bookmodel import Book
+from src.books.adapters.models.Genremodel import Genre
+from src.reservations.adapters.models.Reservationmodel import Reservation
+from src.users.adapters.models.Authormodel import Author
+from src.users.adapters.models.Citymodel import City
+from src.users.adapters.models.Customermodel import Customer
+from src.users.adapters.models.Usermodel import User
+from src.adapters.outbox_model import OutboxEvent
+from setup_db.database import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

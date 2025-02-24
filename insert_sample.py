@@ -1,5 +1,5 @@
 import asyncpg
-from config.setting import settings
+from src.config.setting import settings
 
 async def insert():
     try:
