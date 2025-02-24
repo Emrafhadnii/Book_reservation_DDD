@@ -27,7 +27,6 @@ async def reserve_book(book_id: int, repos:UnitOfWork = Depends(get_uow),
         book = await book_repo.get_by_id(book_id)
         customer = await customer_repo.get_by_id(user_id)
         reservation_time = 0
-        print("yoyoyyooyoooyyoy")
         if book.units > 0:
             async with lock:
                 if customer.wallet >= base_price and await customer_repo.check_subs(customer=customer):

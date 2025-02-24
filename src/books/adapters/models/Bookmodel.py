@@ -1,8 +1,7 @@
 from sqlalchemy import Column, String, Integer, Numeric, ForeignKey, Sequence, Enum, TIMESTAMP
 from sqlalchemy.orm import relationship
 from setup_db.database import Base , mapper_registry
-
-
+from src.books.adapters.models.Genremodel import Genre
 
 class Book(Base):
     __tablename__ = 'books'

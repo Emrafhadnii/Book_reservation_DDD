@@ -5,7 +5,7 @@ from src.auth.entrypoints.dependencies.otp_dependency import redis_dependency
 class Reservation_queue:
     
     def __init__(self,redis: Redis):
-        self.redis = redis
+        self.redis = redis_dependency.redis
         self.QUEUE_NAME = "reservation_queue"
 
     async def add_user_to_queue(self, message: dict):
@@ -16,11 +16,11 @@ class Reservation_queue:
         timestamp = int(time() * 1e6)
         final_score = priority + (timestamp / 1e10)
         key = f"{user_id}:{book_id}"
-        await self.redis.zadd(self.QUEUE_NAME, {key: final_score})
+        await redis_dependency.redis.zadd(self.QUEUE_NAME, {key: final_score})
     
     async def get_next_user(self,book_id):
         book_id_str = str(book_id)
-        users = await self.redis.zrange(self.QUEUE_NAME, 0, -1, withscores=True)
+        users = await redis_dependency.redis.zrange(self.QUEUE_NAME, 0, -1, withscores=True)
         candidates = []
         for key, score in users:
             try:
@@ -34,7 +34,7 @@ class Reservation_queue:
             return None
         
         next_user_key, _ = min(candidates, key=lambda x: x[1])
-        await self.redis.zrem(self.QUEUE_NAME, next_user_key)
+        await redis_dependency.redis.zrem(self.QUEUE_NAME, next_user_key)
         user_id, book = next_user_key.split(':', 1)
         return {"user_id": user_id, "book_id": book}
 
@@ -43,7 +43,7 @@ class Reservation_queue:
         book_id = message["book_id"]
 
         key = f"{user_id}:{book_id}"
-        result = await self.redis.zrem(self.QUEUE_NAME, key)
+        result = await redis_dependency.redis.zrem(self.QUEUE_NAME, key)
         if result:
             return True
         else:
