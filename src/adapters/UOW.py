@@ -4,10 +4,12 @@ from src.books.adapters.repositories.BookRepo import SqlAlchemyBookRepository
 from src.users.adapters.repositories.CustomerRepo import SqlAlchemyCustomerRepository
 from src.reservations.adapters.repositories.ReservationRepo import SqlAlchemyReservationRepository
 from src.users.adapters.repositories.AuthorRepo import SqlAlchemyAuthorRepository
+from src.adapters.repositories.outbox_repo import OutBoxEventRepository
 
 class UnitOfWork:
     def __init__(self):
         self.session = SessionLocal()
+        self.outbox = OutBoxEventRepository(self.session)
         self.author = SqlAlchemyAuthorRepository(self.session)
         self.user = SqlAlchemyUserRepository(self.session)
         self.book = SqlAlchemyBookRepository(self.session)

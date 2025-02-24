@@ -41,7 +41,11 @@ async def reserve_book(book_id: int, repos:UnitOfWork = Depends(get_uow),
                     await book_repo.stock_update(book_id,-1)
                 reservation = Reservation(customer=customer,book=book,start_time=datetime.now(),end_time=datetime.now() + timedelta(reservation_time*7),price=reservation_time*7000)
                 await reservation_repo.add(reservation=reservation)
-
+            event_message = {
+                "aggregate_id": book_id,
+                "event_type": "updated"
+            }
+            await BookEvents.booktablechanged_event(bus,event_message)
             return {"message":"correct,reservation"}
         else:
             message = {
@@ -73,6 +77,13 @@ async def return_book(reservation_id: int, repos: UnitOfWork = Depends(get_uow),
         await customer.add_to_wallet(reserved_book.customer.user.id,new_price)        
         await book.stock_update(reserved_book.book.id,1)        
         await reservation.delete(reservation_id)
+    
+    event_message = {
+                "aggregate_id": reserved_book_id,
+                "event_type": "updated"
+            }
+    await BookEvents.booktablechanged_event(bus,event_message)
+
     if reserved_book_count == 0:
         await BookEvents.bookisavailable_event(bus=bus,book_id=reserved_book_id)
     else:

@@ -13,7 +13,6 @@ class BookHandler:
         sleep(2)
         user = await reservation_queue.get_next_user(int(message['book_id']))
         async with UnitOfWork() as uow:
-            print("\n\n\nyoyoyo\n\n\n")
             base_price = 7000
             customer = await uow.customer.get_by_id(int(user['user_id']))
             book = await uow.book.get_by_id(int(user['book_id']))
@@ -29,6 +28,9 @@ class BookHandler:
                             reservation_time = 2
                     if reservation_time > 0:
                         await uow.book.stock_update(book.id,-1)
-                    print("\n\n\nlillooojjonb\n\n\n")
                     reservation = Reservation(customer=customer,book=book,start_time=datetime.now(),end_time=datetime.now() + timedelta(reservation_time*7),price=reservation_time*7000)
                     await uow.reservation.add(reservation=reservation)
+    
+    async def booktablechanged_event(message: dict):
+        async with UnitOfWork() as uow:
+            await uow.outbox.add(event=message)

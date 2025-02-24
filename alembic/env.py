@@ -9,6 +9,7 @@ from src.users.adapters.models.Authormodel import Author
 from src.users.adapters.models.Citymodel import City
 from src.users.adapters.models.Customermodel import Customer
 from src.users.adapters.models.Usermodel import User
+from src.adapters.outbox_model import OutboxEvent
 from setup_db.database import Base
 
 # this is the Alembic Config object, which provides

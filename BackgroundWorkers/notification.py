@@ -11,5 +11,3 @@ async def send_notification():
                 if (item.end_time - datetime.now()) <= timedelta(days=1):
                     print(f"Notification: Reservation is ending in 1 day.")
         await asyncio.sleep(7200)
-
-
