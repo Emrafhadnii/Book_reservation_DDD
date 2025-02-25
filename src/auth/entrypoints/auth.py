@@ -9,10 +9,13 @@ from src.services_layer.bus_dependency import get_message_bus
 from src.auth.services.otp_service import otp_generator, otp_validator
 from uuid import uuid4
 from src.users.domain.events import UserEvents
+from src.services_layer.ratelimiter import login_ratelimiter
+
 
 router = APIRouter(prefix='/login', tags=['login'])
 
 @router.post("/")
+@login_ratelimiter
 async def login_route(form_data: LoginRequest, user_repo: UnitOfWork = Depends(get_uow), redis: Redis = Depends(get_redis)):    
     
     user_uow = user_repo.user
@@ -30,6 +33,9 @@ async def login_route(form_data: LoginRequest, user_repo: UnitOfWork = Depends(g
 
     otp_code = await otp_generator(user.phone, redis)
 
+    await redis.delete(f"login_{120}:{form_data.phone}")
+    await redis.delete(f"login_{3600}:{form_data.phone}")
+    
     return {
         "message": "otp sent",
         "user_identifier": user_identifier,
