@@ -1,5 +1,4 @@
-from fastapi import HTTPException, status
-import time
+from fastapi import HTTPException
 from functools import wraps
 
 class RateLimiter:
@@ -17,12 +16,12 @@ class RateLimiter:
             blocked = False
             max_ttl = 0
             
-            for max_req, window in self.limits:
-                key = f"login_{window}:{phone}"
+            for max_req, time in self.limits:
+                key = f"login_{time}:{phone}"
                 current = await redis.incr(key)
                 
                 if current == 1:
-                    await redis.expire(key, window)
+                    await redis.expire(key, time)
                 
                 if current > max_req:
                     ttl = await redis.ttl(key)
