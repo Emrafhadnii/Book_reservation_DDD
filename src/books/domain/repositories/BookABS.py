@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from src.books.domain.entities.Books import Book
-from src.abstractions.first_layer_ABS import FirstAbstractionLayer
+from src.adapters.repositories.first_layer_ABS import FirstAbstractionLayer
 
 
 class BookRepository(FirstAbstractionLayer[Book]):

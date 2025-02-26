@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from datetime import datetime
 from src.reservations.domain.entities.Reservations import Reservation
-from src.abstractions.first_layer_ABS import FirstAbstractionLayer
+from src.adapters.repositories.first_layer_ABS import FirstAbstractionLayer
 
 class ReservationRepository(FirstAbstractionLayer[Reservation]):
 

@@ -2,7 +2,7 @@ from abc import abstractmethod
 from src.users.domain.entities.Users import Customer
 from src.users.domain.enums import SubscriptionModel
 from datetime import datetime
-from src.abstractions.first_layer_ABS import FirstAbstractionLayer
+from src.adapters.repositories.first_layer_ABS import FirstAbstractionLayer
 
 class CustomerRepository(FirstAbstractionLayer[Customer]):
 
