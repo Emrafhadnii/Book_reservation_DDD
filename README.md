@@ -5,6 +5,9 @@
 ██████╔╝██║  ██║╚██████╔╝██║  ██╗██║  ██║███████╗███████║
 ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝
 
+#Note
+for better view, open README.md file and click on blame button
+
 =======================
   SYSTEM ARCHITECTURE 
 =======================
