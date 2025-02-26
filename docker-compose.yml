@@ -21,7 +21,7 @@ services:
     command: >
       bash -c "alembic upgrade head &&
               python insert_sample.py &&
-              uvicorn main:app --host 0.0.0.0 --reload"
+              uvicorn src.main:app --host 0.0.0.0 --reload"
     networks:
       - app-network
 
