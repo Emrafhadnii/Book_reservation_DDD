@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     await messagebus.connect()
     await Consumers.comsuming_queues(messagebus)
     asyncio.create_task(send_notification())
-    await db['books'].create_index([('title', 'text')], default_language='english')
+    await db['books'].create_index([('title', 'text'), ('book_desc', 'text')], default_language='english')
     asyncio.create_task(outbox_event_listener())
 
     yield

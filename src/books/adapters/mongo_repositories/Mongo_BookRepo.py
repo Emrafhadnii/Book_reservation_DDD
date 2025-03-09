@@ -44,8 +44,7 @@ class MongoDBBookRepository(BookRepository):
     
     async def search_by_text(self,text: str):
         cursor = self.collection.find(
-        {"$text": {"$search": text}},
-        {"score": {"$meta": "textScore"}}
+        {"$text": {"$search": text}}
         )
         results = await cursor.to_list(length=None)
         return list(map(MongoBookMapper.to_Entity,results))
