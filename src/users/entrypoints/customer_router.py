@@ -3,27 +3,45 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from src.adapters.UOW import UnitOfWork
 from src.users.domain.entities.Users import Customer, charge_account_model, purchase_model
 from datetime import datetime, timedelta
-
+from src.auth.entrypoints.dependencies.otp_dependency import get_redis
 from fastapi import HTTPException
+from redis import Redis
+import json
+from src.users.domain.entities.Users import Customer
 
 router = APIRouter(prefix='/customer', tags=['customer'])
 
 @router.get("/")
 async def get_customers(repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),
-                        page: int = Query(1, ge=1), per_page: int = Query(5, ge=5)):
-    print(token)
+                        page: int = Query(1, ge=1), per_page: int = Query(5, ge=5), redis: Redis = Depends(get_redis)):
+
     if token['role'] == "ADMIN":
+        # cache_key = f"page_{page}_{per_page}"
+        # customer_cached = await redis.get(cache_key)
+        # if customer_cached:
+        #     return json.loads(customer_cached)
         customer_repo = repos.customer
         customers = await customer_repo.get_all(page, per_page)
-        return list(Customer.model_validate(customer) for customer in customers)
+        customers_list = list(dict(customer) for customer in customers)
+        # await redis.setex(cache_key,60,json.dumps(customers_list))
+        return customers_list
     else:
         raise HTTPException(404, detail="Not authorized")
 
 @router.get('/{customer_id}')
-async def get_customer(customer_id: int, repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user)):
+async def get_customer(customer_id: int, repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),
+                       redis: Redis = Depends(get_redis)):
     if token["role"] == "ADMIN" or customer_id == int(token["user_id"]):
+        cache_key = f"customer_{customer_id}"
+        customer_cached = await redis.get(cache_key)
+        if customer_cached:
+            return json.loads(customer_cached)
+
         customer_repo = repos.customer
         customer = await customer_repo.get_by_id(customer_id)
+        
+        await redis.setex(cache_key,60,json.dumps(dict(customer)).encode('utf-8'))
+        
         return dict(customer)
     else:
         raise HTTPException(404, detail="Not authorized")

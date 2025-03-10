@@ -16,10 +16,20 @@ def get_mongo_repo():
 
 @router.get("/")
 async def get_books(repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),
-                    page: int = Query(1,ge=1), per_page: int = Query(5,ge=5)):
+                    page: int = Query(1,ge=1), per_page: int = Query(5,ge=5), redis: Redis = Depends(get_redis)):
+    
+    cache_key = f"book_{page}_{per_page}"
+    book_cached = await redis.get(cache_key)
+    if book_cached:
+        return json.loads(book_cached)
+
     book_repo = repos.book
     books = await book_repo.get_all(page,per_page)
-    return list(Book.model_validate(book) for book in books)
+    books_list = list(dict(book) for book in books)
+
+    await redis.setex(cache_key,60,json.dumps(books_list).encode('utf-8'))
+
+    return books
 
 @router.get('/{book_id}')
 async def get_book(book_id: int, repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),
@@ -33,7 +43,7 @@ async def get_book(book_id: int, repos: UnitOfWork = Depends(get_uow), token = D
     
     book_repo = repos.book
     book = await book_repo.get_by_id(book_id)
-    
+
     await redis.setex(cache_key,60,json.dumps(dict(book)).encode('utf-8'))
     
     return dict(book)
