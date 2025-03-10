@@ -1,60 +1,33 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, Request
+from fastapi import APIRouter, Depends, Query
 from src.auth.entrypoints.dependencies.userauth import get_uow,get_current_user
 from src.adapters.UOW import UnitOfWork
-from src.books.domain.entities.Books import Book
-from src.books.adapters.mongo_repositories.Mongo_BookRepo import MongoDBBookRepository
+from src.books.entrypoints.mongo_dependency import get_mongo_repo
 from src.auth.entrypoints.dependencies.otp_dependency import get_redis
 from redis import Redis
-import json
-from src.auth.services.JWT import JWTService
 from src.services_layer.permission import check_permission
+from src.books.domain.queries import Book_Queries
 
 router = APIRouter(prefix='/book',tags=['book'])
 
-def get_mongo_repo():
-    return MongoDBBookRepository()
-
 admin_permission = check_permission(only_admin=True)
+
 @router.get("/")
 @admin_permission
 async def get_books(repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),
                     page: int = Query(1,ge=1), per_page: int = Query(5,ge=5), redis: Redis = Depends(get_redis)):
     
-    if token["role"] == "ADMIN":
-        cache_key = f"book_{page}_{per_page}"
-        book_cached = await redis.get(cache_key)
-        if book_cached:
-            return json.loads(book_cached)
+    return await Book_Queries.get_all_books(page=page, per_page=per_page,
+                                            redis=redis, repos=repos)
 
-        book_repo = repos.book
-        books = await book_repo.get_all(page,per_page)
-        books_list = list(dict(book) for book in books)
-
-        await redis.setex(cache_key,60,json.dumps(books_list).encode('utf-8'))
-
-        return books
-    else:
-        raise HTTPException(401)
 
 @router.get('/{book_id}')
 async def get_book(book_id: int, repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),
                    redis: Redis = Depends(get_redis)):
     
-    if token["role"] == "ADMIN":
-        cache_key = f"book_{int(book_id)}"
-        book_cached = await redis.get(cache_key)
-        
-        if book_cached:
-            return json.loads(book_cached)
-        
-        book_repo = repos.book
-        book = await book_repo.get_by_id(book_id)
+    return await Book_Queries.get_one_book(book_id=book_id, redis=redis, 
+                                           repos=repos)
+    
 
-        await redis.setex(cache_key,60,json.dumps(dict(book)).encode('utf-8'))
-        
-        return dict(book)
-    else:
-        raise HTTPException(401)
 @router.get('/search/{text}')
 async def search_by_name_desc(text: str,mongobook = Depends(get_mongo_repo) , token = Depends(get_current_user)):
     result = await mongobook.search_by_text(text=text)
