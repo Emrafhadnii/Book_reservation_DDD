@@ -23,8 +23,3 @@ class Reservation(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class cancel_queued_reservation(BaseModel):
-    user_id: int 
-    book_id: int

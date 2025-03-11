@@ -22,3 +22,4 @@ class check_permission:
             return await endpoint(*args, **kwargs)
         return wrraped_endpoint
     
+admin_permission = check_permission(only_admin=True)
