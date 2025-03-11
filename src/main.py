@@ -33,28 +33,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
-# @app.middleware("http")
-# async def auth_middlewaer(request: Request, call_next):
-#     auth_header = request.headers.get("Authorization")
-#     if not auth_header:
-#         raise HTTPException(401, detail="Missing authorization header")
-    
-#     scheme, token = auth_header.split()
-#     if scheme.lower() != "bearer":
-#         raise HTTPException(401, detail="Invalid authentication scheme")
-
-#     return await call_next(request)
-
-
 app.include_router(signup_router)
 app.include_router(book_router)
 app.include_router(auth_router)
