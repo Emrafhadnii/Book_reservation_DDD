@@ -19,3 +19,6 @@ class PurchaseCommand(BaseModel):
         if value not in ("PLUS","PREMIUM"):
             raise ValueError('sub_model is invalid')
         return value
+    
+class UserDeleteCommand(BaseModel):
+    user_id: int

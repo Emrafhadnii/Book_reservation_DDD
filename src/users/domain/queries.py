@@ -6,3 +6,10 @@ class AllCustomers(BaseModel):
 
 class OneCustomer(BaseModel):
     customer_id: int
+
+class OneUser(BaseModel):
+    user_id: int
+
+class AllUsers(BaseModel):
+    page: int = Field(1, ge=1)
+    per_page: int = Field(5, ge=5)

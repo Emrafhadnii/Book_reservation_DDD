@@ -64,23 +64,3 @@ class City(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class charge_account_model(BaseModel):
-    id: int
-    amount: int
-
-    @field_validator('amount')
-    def wallet_check(cls, value):
-        if value < 0:
-            raise ValueError('charge amount cannot be negative')
-        return value
-class purchase_model(BaseModel):
-    id: int
-    sub_model: str
-
-    @field_validator('sub_model')
-    def wallet_check(cls, value):
-        if value not in ("PLUS","PREMIUM"):
-            raise ValueError('sub_model is invalid')
-        return value

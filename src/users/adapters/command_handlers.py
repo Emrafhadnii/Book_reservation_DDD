@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from src.users.domain.commands import PurchaseCommand, ChargeCommand
+from src.users.domain.commands import PurchaseCommand, ChargeCommand, UserDeleteCommand
 from datetime import datetime, timedelta
 
 
@@ -44,3 +44,16 @@ class CustomerCommandHandler:
             }
         except Exception as e:
             raise HTTPException(400,str(e))
+        
+class UserCommandHandler:
+
+    @staticmethod
+    async def delete_user(command: UserDeleteCommand, token, repos):
+        if (token["role"] == "ADMIN") or (command.user_id == int(token["user_id"])):
+            user_repo = repos.user
+            await user_repo.delete(command.user_id)
+            return {
+                "message": "user deleted successfully"
+            }
+        else:
+            raise HTTPException(404, detail="Not authorized")
