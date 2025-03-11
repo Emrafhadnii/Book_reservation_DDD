@@ -221,6 +221,41 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "search",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "get_book_by_id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicGhvbmUiOiIwOTEyMzQ1Njc4OSIsInJvbGUiOiJBRE1JTiIsImV4cCI6MTc0MTUzMTM5NH0.7yTzLF39rHJlYspBYxzR_aUIVYVqWC_N_M61aHC7S6o",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}book/9",
+							"host": [
+								"{{base_url}}book"
+							],
+							"path": [
+								"9"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -369,6 +404,14 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "get_one_customer",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"auth": {
@@ -481,10 +524,29 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "get_reservation",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwicGhvbmUiOiIwOTEyMzQ1Njc4NiIsInJvbGUiOiJDVVNUT01FUiIsImV4cCI6MTc0MDQwMzU4MH0.FChhKxQjArv0gEI3TPB3TiG1CX0LuUse3fPoCikysnY",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}reservation/2",
+							"host": [
+								"{{base_url}}reservation"
+							],
+							"path": [
+								"2"
+							]
+						}
 					},
 					"response": []
 				}
