@@ -7,7 +7,7 @@ class CustomerQueryHandler:
 
     @staticmethod
     async def get_all(query: AllCustomers, repos, redis):
-        cache_key = f"book_{query.page}_{query.per_page}"
+        cache_key = f"customer_{query.page}_{query.per_page}"
         
         customers_cached = await redis.get(cache_key)
         if customers_cached:
@@ -32,7 +32,7 @@ class CustomerQueryHandler:
             customer_repo = repos.customer
             customer = await customer_repo.get_by_id(query.customer_id)
             
-            await redis.setex(cache_key,60,json.dumps(dict(customer)).encode('utf-8'))
+            await redis.setex(cache_key,60,json.dumps(Customer.model_dump(customer)).encode('utf-8'))
             
             return dict(customer)
         else:
@@ -59,8 +59,15 @@ class UserQueryHandler:
     @staticmethod
     async def get_one(query: OneUser, token, repos, redis):
         if (token["role"] == "ADMIN") or (query.user_id == int(token["user_id"])):
+            cache_key = f"user_{query.user_id}"
+            user_cached = await redis.get(cache_key)
+            if user_cached:
+                return json.loads(user_cached)
             user_repo = repos.user
             user = await user_repo.get_by_id(query.user_id)
+
+            await redis.setex(cache_key,60,json.dumps(dict(user)).encode('utf-8'))
+
             return dict(user)
         else:
             raise HTTPException(404, detail="Not authorized")
