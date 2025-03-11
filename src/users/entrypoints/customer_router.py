@@ -19,7 +19,7 @@ async def get_customers(repos: UnitOfWork = Depends(get_uow),
                         redis: Redis = Depends(get_redis)):
 
     return await CustomerQueryHandler.get_all(query=query, 
-                                              repos=repos)
+                                              repos=repos, redis=redis)
 
 @router.get('/{customer_id}')
 async def get_customer(customer_id: int, repos: UnitOfWork = Depends(get_uow), token = Depends(get_current_user),

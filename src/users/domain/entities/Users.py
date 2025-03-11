@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, field_serializer
 from datetime import datetime
 from typing import Optional, List
 from src.users.domain.enums import UserRole
@@ -30,6 +30,17 @@ class Customer(BaseModel):
 
     def __eq__(self, other):
         return isinstance(other, Customer) and self.user.id == other.user.id
+
+    @field_serializer('user')
+    def serialize_user(self, user: User, _info):
+        return user.model_dump()
+
+    @field_serializer('subscription_end')
+    def serialaize_subs(self, subs: Optional[datetime], _info):
+        if subs is None:
+            return None
+        return subs.isoformat()
+
 
     @field_validator('wallet')
     def wallet_check(cls, value):

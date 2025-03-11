@@ -1,15 +1,24 @@
 from src.users.domain.queries import AllCustomers, OneCustomer, OneUser, AllUsers
 import json
 from fastapi import HTTPException
-
+from src.users.domain.entities.Users import Customer
 
 class CustomerQueryHandler:
 
     @staticmethod
-    async def get_all(query: AllCustomers, repos):
+    async def get_all(query: AllCustomers, repos, redis):
+        cache_key = f"book_{query.page}_{query.per_page}"
+        
+        customers_cached = await redis.get(cache_key)
+        if customers_cached:
+            return json.loads(customers_cached)
+        
         customer_repo = repos.customer
         customers = await customer_repo.get_all(query.page, query.per_page)
-        customers_list = list(dict(customer) for customer in customers)
+        customers_list = list(Customer.model_dump(customer) for customer in customers)
+
+        await redis.setex(cache_key,60,json.dumps(customers_list).encode('utf-8'))
+
         return customers_list
     
     @staticmethod
