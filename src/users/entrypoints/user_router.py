@@ -1,5 +1,6 @@
 from src.auth.entrypoints.dependencies.userauth import get_uow,get_current_user
 from src.adapters.UOW import UnitOfWork
+from fastapi import APIRouter, Depends
 from src.auth.entrypoints.dependencies.otp_dependency import get_redis
 from redis import Redis
 from src.users.domain.commands import UserDeleteCommand
