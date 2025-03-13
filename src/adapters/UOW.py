@@ -5,6 +5,7 @@ from src.users.adapters.repositories.CustomerRepo import SqlAlchemyCustomerRepos
 from src.reservations.adapters.repositories.ReservationRepo import SqlAlchemyReservationRepository
 from src.users.adapters.repositories.AuthorRepo import SqlAlchemyAuthorRepository
 from src.adapters.repositories.outbox_repo import OutBoxEventRepository
+from src.adapters.repositories.queuerepo import QueueOutboxRepository
 
 class UnitOfWork:
     def __init__(self):
@@ -15,6 +16,7 @@ class UnitOfWork:
         self.book = SqlAlchemyBookRepository(self.session)
         self.customer = SqlAlchemyCustomerRepository(self.session)
         self.reservation = SqlAlchemyReservationRepository(self.session)
+        self.queue = QueueOutboxRepository(self.session)
     
     async def commit(self):
         await self.session.commit()

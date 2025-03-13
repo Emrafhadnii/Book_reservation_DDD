@@ -1,7 +1,6 @@
 from src.reservations.domain.entities.Reservations import Reservation
 from src.adapters.UOW import UnitOfWork
 from datetime import datetime,timedelta
-from src.reservations.services.reservation_queue import reservation_queue
 from time import sleep
 from asyncio.locks import Lock
 
@@ -10,11 +9,12 @@ lock = Lock()
 class BookHandler:
     
     async def bookisavailable_handler(message: dict):
-        sleep(2)
-        user = await reservation_queue.get_next_user(int(message['book_id']))
-        book_id = int(message['book_id'])
-        user_id = int(user['user_id'])
         async with UnitOfWork() as uow:
+            firts_in_queue = await uow.queue.get_first_unprocessed()
+
+            book_id = int(message['book_id'])
+            user_id = int(firts_in_queue.user_id)
+
             base_price = 7000
             customer = await uow.customer.get_by_id(user_id)
             book = await uow.book.get_by_id(book_id)
@@ -30,8 +30,15 @@ class BookHandler:
                             reservation_time = 2
                     if reservation_time > 0:
                         await uow.book.stock_update(book.id,-1)
-                    reservation = Reservation(customer=customer,book=book,start_time=datetime.now(),end_time=datetime.now() + timedelta(reservation_time*7),price=reservation_time*7000)
+                    reservation = Reservation(customer=customer,book=book,start_time=datetime.now(),
+                                              end_time=datetime.now() + timedelta(reservation_time*7),
+                                              price=reservation_time*7000)
                     await uow.reservation.add(reservation=reservation)
+                    command = {
+                        'book_id': book_id,
+                        'user_id': user_id
+                    }
+                    await uow.queue.set_processed(command)
     
     async def booktablechanged_event(message: dict):
         async with UnitOfWork() as uow:

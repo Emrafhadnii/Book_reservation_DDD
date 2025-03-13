@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from src.reservations.services.reservation_queue import reservation_queue
 from src.reservations.domain.commands import DeleteReservation
 from src.reservations.domain.commands import CancelQueuedReservation
 from src.reservations.domain.entities.Reservations import Reservation
@@ -7,19 +6,22 @@ from src.books.domain.events import BookEvents
 from asyncio.locks import Lock
 from src.books.domain.queries import One_Book
 from datetime import datetime, timedelta
+from src.reservations.domain.events import ReservationEvents
+from src.adapters.UOW import UnitOfWork
+
 
 lock = Lock()
 
 class ReservationCommandHandler:
 
     @staticmethod
-    async def delete(command: DeleteReservation, repos):
+    async def delete(command: DeleteReservation, repos: UnitOfWork):
         reservation_repo = repos.reservation
         await reservation_repo.delete(command.reservation_id)
 
     @staticmethod
     async def cancel_reservation(command: CancelQueuedReservation,
-                                 token, repos):
+                                 token, repos: UnitOfWork):
         if (token['role'] == "ADMIN") or (command.user_id) == int(token['user_id']):
             try:
                 customer = await repos.customer.get_by_id(command.user_id)
@@ -28,14 +30,11 @@ class ReservationCommandHandler:
                     "book_id":command.book_id,
                     "sub_model":customer.sub_model
                 }
-                if await reservation_queue.remove_user_from_queue(message):
-                    return {
-                        "messgae":"removed from queue"
-                    }
-                else:
-                    return {
-                        "messgae":"does not removed from queue"
-                    }
+                
+                await repos.queue.delete(message)
+                return {
+                    "message": "user removed from queue successfully"
+                }
             except Exception as e:
                 raise HTTPException(408,detail="wtf")
 
@@ -43,7 +42,7 @@ class ReservationCommandHandler:
             raise HTTPException(404, detail="Not authorized")
     
     @staticmethod
-    async def reserve(command: One_Book, repos, bus, token):
+    async def reserve(command: One_Book, repos: UnitOfWork, bus, token):
         try:
             user_id = int(token["user_id"])
             book_repo = repos.book
@@ -87,7 +86,8 @@ class ReservationCommandHandler:
                     "book_id": command.book_id,
                     "sub_model": customer.sub_model
                 }
-                await reservation_queue.add_user_to_queue(message=message)
+                await ReservationEvents.queue_event(bus=bus,
+                                                    message=message)
                 return {
                     "messgae":"The book is not available but you have been added to the reservation queue"
                 }
@@ -95,7 +95,7 @@ class ReservationCommandHandler:
             raise HTTPException(400,detail=[str(e)])
         
     @staticmethod 
-    async def return_book(command: DeleteReservation, repos, bus):
+    async def return_book(command: DeleteReservation, repos: UnitOfWork, bus):
         reservation = repos.reservation
         customer = repos.customer
         book = repos.book
@@ -117,8 +117,7 @@ class ReservationCommandHandler:
 
         if reserved_book_count == 0:
             await BookEvents.bookisavailable_event(bus=bus,book_id=reserved_book_id)
-        else:
-            raise HTTPException(404,detail=['reservation not found'])
+
         return {
             "messgae":"book returned correctly"
             }
